@@ -12,7 +12,7 @@ with backend running, open new teminal.
 change directory to C:\Projects\learning-starter\Web\LearningStarter\learning-starter-web 
 Then use command "npm.cmd start".
 This starts up the frontend.
-Navigate to https://localhost:5001/home to go to the website
+Navigate to https://localhost:5001 to go to the website
 
 Login with
 Username: admin
