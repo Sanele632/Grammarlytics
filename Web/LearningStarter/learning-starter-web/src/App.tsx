@@ -15,7 +15,7 @@ const theme = createTheme({
 //This is almost the base level of your app.  You can also put global things here.
 function App() {
   return (
-      <MantineProvider theme={theme} defaultColorScheme="dark">
+      <MantineProvider theme={theme} defaultColorScheme="light">
         <MantineEmotionProvider>
         <Notifications  position="top-right" autoClose={3000} limit={5} />
           <Container fluid px={0} className="App">
