@@ -61,7 +61,7 @@ const navigation: NavigationItem[] = [
     },
   },
   {
-    text: "User",
+    text: "Profile",
     hide: false,
     nav: {
       to: routes.user,

@@ -19,5 +19,5 @@ Username: admin
 Password: Password
 
 Notes:
-Sidebar should be added to pagewrapper.tsx so we can include it on every page.
+Sidebar should be added to navigation.tsx so we can include it on every page.
 We're using mantine for the frontend 
