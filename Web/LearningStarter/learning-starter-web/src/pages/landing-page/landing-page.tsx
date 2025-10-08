@@ -1,4 +1,10 @@
-import { Container, Text, Box, SegmentedControl } from "@mantine/core";
+import {
+  Container,
+  Text,
+  Box,
+  SegmentedControl,
+  Textarea,
+} from "@mantine/core";
 import { createStyles } from "@mantine/emotion";
 
 const PURPLE = "#73268D";
@@ -21,6 +27,18 @@ export const LandingPage = () => {
           onChange={() => {}}
           radius="md"
         />
+
+        <Text className={classes.sectionLabel}>
+          What can we correct for you today, Joane?
+        </Text>
+
+        <Textarea
+          className={classes.card}
+          minRows={8}
+          autosize
+          placeholder="Start writing here..."
+          styles={{ input: { background: "#F7F7F7", border: "none" } }}
+        />
       </Container>
     </Box>
   );
@@ -29,6 +47,7 @@ export const LandingPage = () => {
 const useStyles = createStyles(() => ({
   page: { background: "#fff", minHeight: "100vh" },
   main: { paddingTop: 12, paddingBottom: 40 },
+
   title: {
     textAlign: "center",
     color: PURPLE,
@@ -36,6 +55,7 @@ const useStyles = createStyles(() => ({
     fontSize: 40,
     margin: "12px 0",
   },
+
   segment: {
     width: 760,
     margin: "0 auto 18px auto",
@@ -51,5 +71,20 @@ const useStyles = createStyles(() => ({
       fontWeight: 500,
       fontSize: 14,
     },
+  },
+
+  sectionLabel: {
+    color: PURPLE,
+    fontWeight: 500,
+    fontSize: 16,
+    marginTop: 4,
+    marginBottom: 8,
+  },
+
+  card: {
+    borderRadius: 24,
+    boxShadow: "0px 4px 60px rgba(0,0,0,0.15)",
+    padding: 10,
+    textarea: { borderRadius: 24, padding: 16, fontSize: 14 },
   },
 }));
