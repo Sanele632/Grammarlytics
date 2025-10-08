@@ -18,9 +18,14 @@ export const LandingPage = () => {
 
   const [inputText, setInputText] = useState("");
   const [tone, setTone] = useState<string | null>(null);
+  const [outputText, setOutputText] = useState("");
 
-  const handleCorrectGrammar = () => {
+  const handleCorrectGrammar = async () => {
     console.log("Correcting:", { inputText, tone });
+  };
+
+  const handleSave = () => {
+    console.log("Saving:", { inputText, outputText, tone });
   };
 
   return (
@@ -67,6 +72,25 @@ export const LandingPage = () => {
             rightSectionWidth={28}
             comboboxProps={{ shadow: "md" }}
           />
+        </Group>
+
+        <Text className={classes.sectionLabel} style={{ marginTop: 24 }}>
+          Here’s what we got!
+        </Text>
+
+        <Textarea
+          className={classes.card}
+          minRows={8}
+          autosize
+          value={outputText}
+          onChange={(e) => setOutputText(e.currentTarget.value)}
+          styles={{ input: { background: "#F7F7F7", border: "none" } }}
+        />
+
+        <Group justify="center" mt="lg">
+          <Button className={classes.saveBtn} onClick={handleSave}>
+            Save Text
+          </Button>
         </Group>
       </Container>
     </Box>
@@ -128,7 +152,6 @@ const useStyles = createStyles(() => ({
     fontWeight: 500,
     "&:hover": { background: "#eee" },
   },
-
   selectBtn: {
     ".mantine-Select-input": {
       background: "transparent",
@@ -141,5 +164,17 @@ const useStyles = createStyles(() => ({
       boxShadow: "none",
     },
     ".mantine-Select-rightSection": { pointerEvents: "none" },
+  },
+
+  saveBtn: {
+    background: "#F7F7F7",
+    color: PURPLE,
+    border: "none",
+    height: 42,
+    width: 220,
+    borderRadius: 999,
+    boxShadow: "0px 4px 25px rgba(0,0,0,0.25)",
+    fontWeight: 500,
+    "&:hover": { background: "#eee" },
   },
 }));
