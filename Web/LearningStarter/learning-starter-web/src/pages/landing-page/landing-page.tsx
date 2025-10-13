@@ -9,23 +9,37 @@ import {
   Select,
 } from "@mantine/core";
 import { createStyles } from "@mantine/emotion";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 const PURPLE = "#73268D";
+const CORRECTION_ROUTE = "/";          // home
+const PRACTICE_ROUTE = "/practice";    // practice page
 
 export const LandingPage = () => {
   const { classes } = useStyles();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const tabValue = location.pathname === PRACTICE_ROUTE ? "practice" : "correction";
 
   const [inputText, setInputText] = useState("");
   const [tone, setTone] = useState<string | null>(null);
   const [outputText, setOutputText] = useState("");
 
+  const handleSwitch = (val: string) => {
+    if (val === "practice") navigate(PRACTICE_ROUTE);
+    else navigate(CORRECTION_ROUTE);
+  };
+
   const handleCorrectGrammar = async () => {
-    console.log("Correcting:", { inputText, tone });
+    // TODO: call your backend, then setOutputText(responseText)
+    setOutputText(inputText); // placeholder
   };
 
   const handleSave = () => {
-    console.log("Saving:", { inputText, outputText, tone });
+    // TODO: save text
+    console.log("save", { inputText, outputText, tone });
   };
 
   return (
@@ -39,8 +53,8 @@ export const LandingPage = () => {
             { label: "Grammar Correction", value: "correction" },
             { label: "Grammar Practice", value: "practice" },
           ]}
-          value="correction"
-          onChange={() => {}}
+          value={tabValue}
+          onChange={handleSwitch}
           radius="md"
         />
 
@@ -152,6 +166,7 @@ const useStyles = createStyles(() => ({
     fontWeight: 500,
     "&:hover": { background: "#eee" },
   },
+
   selectBtn: {
     ".mantine-Select-input": {
       background: "transparent",
