@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using IdentityModel;
@@ -165,9 +166,12 @@ public class Startup
         {
             var seededUser = new User
             {
-                FirstName = "Seeded",
-                LastName = "User",
+                FirstName = "Joan",
+                LastName = "Mabrey",
                 UserName = "admin",
+                Email = "joanmabrey@gmail.com",
+                ProfilePicture = "https://images.unsplash.com/photo-1508002366005-75a695ee2d17?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fHdvbWFuJTIweW91bmd8ZW58MHx8MHx8fDA%3D&fm=jpg&q=60&w=3000"
+
             };
 
             await userManager.CreateAsync(seededUser, "Password");
