@@ -1,4 +1,4 @@
-import { Box, Container, Text, SegmentedControl, Select, Textarea, Group, Button} from "@mantine/core";
+import {Box, Container, Text, SegmentedControl, Select, Textarea, Group, Button} from "@mantine/core";
 import { createStyles } from "@mantine/emotion";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
@@ -19,9 +19,14 @@ export const PracticePage = () => {
   const [topic, setTopic] = useState<string | null>(null);
   const [prompt, setPrompt] = useState("");
   const [answer, setAnswer] = useState("");
+  const [solution, setSolution] = useState("");
 
   const handleCheck = () => {
-    console.log("check", { topic, prompt, answer });
+    setSolution(
+      answer.trim()
+        ? "Looks good! (stub)\nWe’ll grade this once the API is wired."
+        : "Try writing an answer first 🙂"
+    );
   };
 
   return (
@@ -43,7 +48,6 @@ export const PracticePage = () => {
         <Text className={classes.sectionLabel}>
           What would you like to practice today, Joane?
         </Text>
-
         <Select
           className={classes.selectPill}
           placeholder="Choose a topic..."
@@ -64,6 +68,7 @@ export const PracticePage = () => {
                 : ""
             );
             setAnswer("");
+            setSolution("");
           }}
         />
 
@@ -96,6 +101,18 @@ export const PracticePage = () => {
             Check Answer
           </Button>
         </Group>
+
+        <Text className={classes.sectionLabel} mt="lg">
+          Solution
+        </Text>
+        <Textarea
+          className={classes.card}
+          minRows={4}
+          autosize
+          value={solution}
+          onChange={(e) => setSolution(e.currentTarget.value)}
+          styles={{ input: { background: "#F7F7F7", border: "none" } }}
+        />
       </Container>
     </Box>
   );
@@ -122,13 +139,13 @@ const useStyles = createStyles(() => ({
       borderRadius: 6,
     },
     ".mantine-SegmentedControl-label": {
-      color: PURPLE,
+      color: "#73268D",
       fontWeight: 500,
       fontSize: 14,
     },
   },
   sectionLabel: {
-    color: PURPLE,
+    color: "#73268D",
     fontWeight: 500,
     fontSize: 16,
     marginTop: 4,
@@ -142,7 +159,7 @@ const useStyles = createStyles(() => ({
   },
   pillBtn: {
     background: "#F7F7F7",
-    color: PURPLE,
+    color: "#73268D",
     border: "none",
     height: 42,
     paddingInline: 28,
