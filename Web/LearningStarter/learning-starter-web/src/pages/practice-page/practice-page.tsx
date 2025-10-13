@@ -1,10 +1,11 @@
-import { Box, Container, Text, SegmentedControl } from "@mantine/core";
+import { Box, Container, Text, SegmentedControl, Select } from "@mantine/core";
 import { createStyles } from "@mantine/emotion";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useState } from "react";
 
 const PURPLE = "#73268D";
-const HOME = "/";          
-const PRACTICE = "/practice"; 
+const HOME = "/";
+const PRACTICE = "/practice";
 
 export const PracticePage = () => {
   const { classes } = useStyles();
@@ -12,9 +13,10 @@ export const PracticePage = () => {
   const location = useLocation();
 
   const tabValue = location.pathname === PRACTICE ? "practice" : "correction";
-  const handleSwitch = (val: string) => {
+  const handleSwitch = (val: string) =>
     navigate(val === "practice" ? PRACTICE : HOME);
-  };
+
+  const [topic, setTopic] = useState<string | null>(null);
 
   return (
     <Box className={classes.page}>
@@ -30,6 +32,25 @@ export const PracticePage = () => {
           value={tabValue}
           onChange={handleSwitch}
           radius="md"
+        />
+
+        <Text className={classes.sectionLabel}>
+          What would you like to practice today, Joane?
+        </Text>
+
+        <Select
+          className={classes.selectPill}
+          placeholder="Choose a topic..."
+          data={[
+            "Commas",
+            "Subject–Verb Agreement",
+            "Pronouns",
+            "Modifiers",
+            "Parallelism",
+            "Verb Tense",
+          ]}
+          value={topic}
+          onChange={setTopic}
         />
       </Container>
     </Box>
@@ -61,5 +82,25 @@ const useStyles = createStyles(() => ({
       fontWeight: 500,
       fontSize: 14,
     },
+  },
+  sectionLabel: {
+    color: PURPLE,
+    fontWeight: 500,
+    fontSize: 16,
+    marginTop: 4,
+    marginBottom: 8,
+  },
+  selectPill: {
+    maxWidth: 380,
+    marginBottom: 8,
+    ".mantine-Select-input": {
+      background: "#F7F7F7",
+      border: "none",
+      height: 38,
+      borderRadius: 999,
+      paddingInline: 16,
+      boxShadow: "0px 4px 25px rgba(0,0,0,0.15)",
+    },
+    ".mantine-Select-dropdown": { borderRadius: 12 },
   },
 }));
