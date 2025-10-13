@@ -1,4 +1,4 @@
-import { Box, Container, Text, SegmentedControl, Select, Textarea } from "@mantine/core";
+import { Box, Container, Text, SegmentedControl, Select, Textarea, Group, Button} from "@mantine/core";
 import { createStyles } from "@mantine/emotion";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
@@ -18,6 +18,11 @@ export const PracticePage = () => {
 
   const [topic, setTopic] = useState<string | null>(null);
   const [prompt, setPrompt] = useState("");
+  const [answer, setAnswer] = useState("");
+
+  const handleCheck = () => {
+    console.log("check", { topic, prompt, answer });
+  };
 
   return (
     <Box className={classes.page}>
@@ -58,13 +63,13 @@ export const PracticePage = () => {
                 ? "Each of the players on the team have practiced hard for the game."
                 : ""
             );
+            setAnswer("");
           }}
         />
 
         <Text className={classes.sectionLabel} mt="sm">
           Correct this statement
         </Text>
-
         <Textarea
           className={classes.card}
           minRows={3}
@@ -73,6 +78,24 @@ export const PracticePage = () => {
           onChange={(e) => setPrompt(e.currentTarget.value)}
           styles={{ input: { background: "#F7F7F7", border: "none" } }}
         />
+
+        <Text className={classes.sectionLabel} mt="sm">
+          Type your answer here
+        </Text>
+        <Textarea
+          className={classes.card}
+          minRows={4}
+          autosize
+          value={answer}
+          onChange={(e) => setAnswer(e.currentTarget.value)}
+          styles={{ input: { background: "#F7F7F7", border: "none" } }}
+        />
+
+        <Group justify="center" mt="md">
+          <Button className={classes.pillBtn} onClick={handleCheck}>
+            Check Answer
+          </Button>
+        </Group>
       </Container>
     </Box>
   );
@@ -116,6 +139,17 @@ const useStyles = createStyles(() => ({
     boxShadow: "0px 4px 60px rgba(0,0,0,0.15)",
     padding: 10,
     textarea: { borderRadius: 24, padding: 16, fontSize: 14 },
+  },
+  pillBtn: {
+    background: "#F7F7F7",
+    color: PURPLE,
+    border: "none",
+    height: 42,
+    paddingInline: 28,
+    borderRadius: 999,
+    boxShadow: "0px 4px 25px rgba(0,0,0,0.25)",
+    fontWeight: 500,
+    "&:hover": { background: "#eee" },
   },
   selectPill: {
     maxWidth: 380,
