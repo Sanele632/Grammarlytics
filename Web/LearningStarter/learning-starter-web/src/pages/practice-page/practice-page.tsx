@@ -1,4 +1,4 @@
-import { Box, Container, Text, SegmentedControl, Select } from "@mantine/core";
+import { Box, Container, Text, SegmentedControl, Select, Textarea } from "@mantine/core";
 import { createStyles } from "@mantine/emotion";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState } from "react";
@@ -17,6 +17,7 @@ export const PracticePage = () => {
     navigate(val === "practice" ? PRACTICE : HOME);
 
   const [topic, setTopic] = useState<string | null>(null);
+  const [prompt, setPrompt] = useState("");
 
   return (
     <Box className={classes.page}>
@@ -50,7 +51,27 @@ export const PracticePage = () => {
             "Verb Tense",
           ]}
           value={topic}
-          onChange={setTopic}
+          onChange={(v) => {
+            setTopic(v);
+            setPrompt(
+              v
+                ? "Each of the players on the team have practiced hard for the game."
+                : ""
+            );
+          }}
+        />
+
+        <Text className={classes.sectionLabel} mt="sm">
+          Correct this statement
+        </Text>
+
+        <Textarea
+          className={classes.card}
+          minRows={3}
+          autosize
+          value={prompt}
+          onChange={(e) => setPrompt(e.currentTarget.value)}
+          styles={{ input: { background: "#F7F7F7", border: "none" } }}
         />
       </Container>
     </Box>
@@ -89,6 +110,12 @@ const useStyles = createStyles(() => ({
     fontSize: 16,
     marginTop: 4,
     marginBottom: 8,
+  },
+  card: {
+    borderRadius: 24,
+    boxShadow: "0px 4px 60px rgba(0,0,0,0.15)",
+    padding: 10,
+    textarea: { borderRadius: 24, padding: 16, fontSize: 14 },
   },
   selectPill: {
     maxWidth: 380,
