@@ -5,6 +5,7 @@ import { useUser } from "../authentication/use-auth";
 import { UserPage } from "../pages/user-page/user-page";
 import { PageWrapper } from "../components/page-wrapper/page-wrapper";
 import { routes } from ".";
+import { PracticePage } from "../pages/practice-page/practice-page";
 
 //This is where you will tell React Router what to render when the path matches the route specified.
 export const Routes = () => {
@@ -15,15 +16,10 @@ export const Routes = () => {
       {/* The page wrapper is what shows the NavBar at the top, it is around all pages inside of here. */}
       <PageWrapper user={user}>
         <Switch>
-          {/* When path === / render LandingPage */}
           <Route path={routes.home} element={<LandingPage />} />
-          {/* When path === /iser render UserPage */}
+          <Route path={routes.practice} element={<PracticePage />} />
           <Route path={routes.user} element={<UserPage />} />
-          {/* Going to route "localhost:5001/" will go to homepage */}
-          <Route path={routes.root} element={<Navigate to={routes.home} />} />
-
-          {/* This should always come last.  
-            If the path has no match, show page not found */}
+          <Route path={routes.root} element={<Navigate to={routes.home} replace />} />
           <Route path="*" element={<NotFoundPage />} />
         </Switch>
       </PageWrapper>
