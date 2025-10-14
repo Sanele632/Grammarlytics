@@ -4,4 +4,6 @@ export const routes = {
   home: "/",
   user: "/user",
   practice: "/practice", 
+  dailyChallenge: "/daily-challenge",
+  learningResources: "/learning-resources",
 };

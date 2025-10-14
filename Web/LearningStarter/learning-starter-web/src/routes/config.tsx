@@ -6,6 +6,8 @@ import { UserPage } from "../pages/user-page/user-page";
 import { PageWrapper } from "../components/page-wrapper/page-wrapper";
 import { routes } from ".";
 import { PracticePage } from "../pages/practice-page/practice-page";
+import { LearningResourcesPage } from "../pages/learning-resources-page/learning-resources-page";
+import { DailyChallengePage } from "../pages/daily-challenge-page/daily-challenge-page";
 
 //This is where you will tell React Router what to render when the path matches the route specified.
 export const Routes = () => {
@@ -19,6 +21,8 @@ export const Routes = () => {
           <Route path={routes.home} element={<LandingPage />} />
           <Route path={routes.practice} element={<PracticePage />} />
           <Route path={routes.user} element={<UserPage />} />
+          <Route path={routes.learningResources} element={<LearningResourcesPage />} />
+          <Route path={routes.dailyChallenge} element={<DailyChallengePage />} />
           <Route path={routes.root} element={<Navigate to={routes.home} replace />} />
           <Route path="*" element={<NotFoundPage />} />
         </Switch>
