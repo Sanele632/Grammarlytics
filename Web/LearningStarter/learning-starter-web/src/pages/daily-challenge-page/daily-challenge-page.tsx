@@ -1,141 +1,69 @@
-import {
-  Card,
-  Title,
-  Text,
-  TextInput,
-  Button,
-  Container,
-  Group,
-  Loader,
-  Badge,
-  Center,
-  Stack,
-} from "@mantine/core";
-import { useForm } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
-import { IconCheck, IconX } from "@tabler/icons-react";
+import { Container, Text, Title, Box, TextInput, Button, Center } from "@mantine/core";
+import { createStyles } from "@mantine/emotion";
 import { useState } from "react";
-import { useAsync, useAsyncFn } from "react-use";
-import api from "../../config/axios";
-import { ApiResponse, DailyChallengeDto } from "../../constants/types";
+
+const PURPLE = "#73268D";
 
 export const DailyChallengePage = () => {
-  const [submissionResult, setSubmissionResult] =
-    useState<SubmissionResult | null>(null);
+  const { classes } = useStyles();
+  const [answer, setAnswer] = useState("");
 
-  // --- API Call to GET Today's Challenge ---
-  const {
-    value: challenge,
-    loading: isLoadingChallenge,
-    error,
-  } = useAsync(async () => {
-    const response = await api.get<ApiResponse<DailyChallengeDto>>(
-      "/api/daily-challenges/today"
-    );
-    return response.data.data;
-  }, []);
-
-  // --- API Call to POST User's Answer ---
-  const [{ loading: isSubmitting }, submitAnswer] = useAsyncFn(
-    async (values: { userAnswer: string }) => {
-      if (!challenge) return;
-
-      const response = await api.post<ApiResponse<SubmissionResult>>(
-        `/api/daily-challenges/submit`,
-        {
-          challengeId: challenge.id,
-          userAnswer: values.userAnswer,
-        }
-      );
-
-      setSubmissionResult(response.data.data);
-
-      notifications.show({
-        title: response.data.data.wasCorrect
-          ? "Correct!"
-          : "Not quite!",
-        message: response.data.data.wasCorrect
-          ? `Your streak is now ${response.data.data.newStreakCount}!`
-          : "Try again tomorrow.",
-        color: response.data.data.wasCorrect ? "green" : "red",
-        icon: response.data.data.wasCorrect ? <IconCheck /> : <IconX />,
-      });
-
-      return response.data;
-    },
-    [challenge]
-  );
-
-  const form = useForm({
-    initialValues: {
-      userAnswer: "",
-    },
-  });
-
-  // --- Loading State ---
-  if (isLoadingChallenge) {
-    return (
-      <Center style={{ height: "100%" }}>
-        <Loader />
-      </Center>
-    );
-  }
-
-  // --- Error State ---
-  if (error || !challenge) {
-    return (
-      <Center style={{ height: "100%" }}>
-        <Text color="red">
-          Could not load the challenge for today. Please try again later.
-        </Text>
-      </Center>
-    );
-  }
-
-  // --- Main Component View ---
   return (
-    <Container size="sm" mt="lg">
-      <Card shadow="sm" padding="lg" radius="md" withBorder>
-        <Stack align="center">
-          <Title order={2}>Daily Challenge</Title>
-          <Badge size="lg" variant="light" color="orange">
-            Streak Count: {submissionResult?.newStreakCount ?? "..."} 🔥
-          </Badge>
-          <Text c="dimmed" fz="sm">
-            {new Date().toLocaleDateString("en-US", { dateStyle: "long" })}
-          </Text>
-          <Text mt="md">
-            Correct this statement to keep your streak alive!
-          </Text>
+    <Container className={classes.page}>
+      <Title className={classes.title}>Daily Challenge</Title>
 
-          <Text c="dimmed" fs="italic" w="100%" p="xs" bg="gray.1">
-            {challenge.incorrectSentence}
-          </Text>
-
-          <form
-            onSubmit={form.onSubmit(submitAnswer)}
-            style={{ width: "100%" }}
-          >
-            <Stack>
-              <TextInput
-                placeholder="Type your answer here"
-                label="Your correction"
-                required
-                {...form.getInputProps("userAnswer")}
-              />
-              <Button type="submit" loading={isSubmitting} disabled={!!submissionResult}>
-                Check Answer
-              </Button>
-            </Stack>
-          </form>
-        </Stack>
-      </Card>
+      <Box className={classes.challengeBox}>
+        <Text className={classes.label}>Correct this statement to keep your streak alive!</Text>
+        <TextInput
+          placeholder="Type your answer here"
+          value={answer}
+          onChange={(e) => setAnswer(e.currentTarget.value)}
+          className={classes.input}
+        />
+        <Center>
+          <Button className={classes.button}>Check Answer</Button>
+        </Center>
+      </Box>
     </Container>
   );
 };
 
-interface SubmissionResult {
-  wasCorrect: boolean;
-  newStreakCount: number;
-}
-
+const useStyles = createStyles(() => ({
+  page: {
+    background: "#fff",
+    minHeight: "100vh",
+    paddingTop: 40,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  title: {
+    color: PURPLE,
+    fontWeight: 500,
+    fontSize: 32,
+    marginBottom: 24,
+  },
+  challengeBox: {
+    background: "#F7F7F7",
+    borderRadius: 16,
+    padding: 24,
+    width: 600,
+    boxShadow: "0px 2px 10px rgba(0,0,0,0.1)",
+  },
+  label: {
+    color: PURPLE,
+    fontWeight: 500,
+    marginBottom: 12,
+    textAlign: "center",
+  },
+  input: {
+    marginBottom: 16,
+  },
+  button: {
+    background: PURPLE,
+    color: "#fff",
+    borderRadius: 20,
+    width: 200,
+    "&:hover": { background: "#5e1f72" },
+  },
+}));
