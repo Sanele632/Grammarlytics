@@ -11,6 +11,10 @@ public class User : IdentityUser<int>
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string? ProfilePicture { get; set; }
+     public int StreakCount { get; set; } = 0;
+    public DateOnly? LastChallengeDate { get; set; }
+
+
 
     public List<UserRole> UserRoles { get; set; } = new();
 }

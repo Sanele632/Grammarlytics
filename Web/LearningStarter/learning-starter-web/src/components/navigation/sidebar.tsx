@@ -1,8 +1,8 @@
 import React from "react";
-import { Drawer, Button, Flex, Text } from "@mantine/core";
+import { Drawer, Button, Flex } from "@mantine/core";
 import { NavLink } from "react-router-dom";
 import { routes } from "../../routes";
-import { IconHome, IconUser, IconBook, IconFlame} from '@tabler/icons-react';
+import { IconHome, IconUser, IconBook, IconFlame } from '@tabler/icons-react';
 
 type SidebarProps = {
   opened: boolean;
@@ -16,10 +16,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ opened, onClose }) => {
       onClose={onClose}
       overlayProps={{ backgroundOpacity: 0.4, blur: 4 }}
       size="xs"
-      //padding="md"
       withCloseButton={true}
     >
-      <Flex direction="column" gap = "lg">
+      <Flex direction="column" gap="lg">
         <Button
           component={NavLink}
           to={routes.home}
@@ -31,7 +30,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ opened, onClose }) => {
         </Button>
         <Button
           component={NavLink}
-          to={routes.user}
+          to={routes.dailyChallenge}
           leftSection={<IconFlame size={17} color="#6E268C" />}
           variant="default"
           onClick={onClose}
@@ -40,8 +39,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ opened, onClose }) => {
         </Button>
         <Button
           component={NavLink}
-          to={routes.user}
-          leftSection={<IconBook size={17} color="#6E268C"/>}
+          to={routes.learningResources}
+          leftSection={<IconBook size={17} color="#6E268C" />}
           variant="default"
           onClick={onClose}
         >
@@ -50,7 +49,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ opened, onClose }) => {
         <Button
           component={NavLink}
           to={routes.user}
-          leftSection={<IconUser size={17} color="#6E268C"/>}
+          leftSection={<IconUser size={17} color="#6E268C" />}
           variant="default"
           onClick={onClose}
         >
@@ -60,3 +59,5 @@ export const Sidebar: React.FC<SidebarProps> = ({ opened, onClose }) => {
     </Drawer>
   );
 };
+
+
