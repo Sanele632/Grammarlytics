@@ -10,8 +10,8 @@ import {
   Title,
   useMantineColorScheme,
 } from "@mantine/core";
-import { IconMenu2, IconFlameFilled } from "@tabler/icons-react";
-import { NavLink } from "react-router-dom";
+import { IconMenu2, IconFlameFilled, IconUser } from "@tabler/icons-react";
+import { NavLink, Link } from "react-router-dom";
 import { routes } from "../../routes";
 import { useAuth } from "../../authentication/use-auth";
 import logo from "../../assets/full logo.png";
@@ -40,7 +40,7 @@ export const PrimaryNavigation: React.FC<PrimaryNavigationProps> = ({
             <ActionIcon
               size="lg"
               variant="subtle"
-              color="purple"
+              color="purple.8"
               onClick={() => setSidebarOpened(true)}
             >
               <IconMenu2 size={24} />
@@ -65,8 +65,12 @@ export const PrimaryNavigation: React.FC<PrimaryNavigationProps> = ({
                   </Avatar>
                 </Menu.Target>
                 <Menu.Dropdown>
-                  <Menu.Item onClick={() => toggleColorScheme()}>
-                    {dark ? "Light mode" : "Dark mode"}
+                  <Menu.Item
+                    component={Link}
+                    to={`/user`} 
+                    leftSection={<IconUser size={16} />}
+                  >
+                    View Profile
                   </Menu.Item>
                   <Menu.Item onClick={() => logout()}>Sign Out</Menu.Item>
                 </Menu.Dropdown>
@@ -85,7 +89,6 @@ const useStyles = createStyles(() => ({
   navbar: {
     height: 60,
     borderBottom: "1px solid #e9ecef",
-    backgroundColor: "white",
   },
   inner: {
     height: "100%",

@@ -5,26 +5,42 @@ import {
   Container,
   createTheme,
 } from "@mantine/core";
-import { Notifications } from "@mantine/notifications";
-import '@mantine/core/styles.css';
 import { MantineEmotionProvider } from "@mantine/emotion";
+import { Notifications } from "@mantine/notifications";
+import "@mantine/core/styles.css";
+
 
 const theme = createTheme({
+  colors: {
+    purple: [
+      "#f5e9fa",
+      "#ebd3f5",
+      "#d9aef0",
+      "#c58be8",
+      "#ae64df",
+      "#9440d6",
+      "#702790",
+      "#5a1f73",
+      "#451757",
+      "#2f0f3a",
+    ],
+  },
+  primaryColor: "purple",
 });
 
-//This is almost the base level of your app.  You can also put global things here.
 function App() {
+
   return (
-      <MantineProvider theme={theme} defaultColorScheme="light">
-        <MantineEmotionProvider>
-        <Notifications  position="top-right" autoClose={3000} limit={5} />
-          <Container fluid px={0} className="App">
-            <AuthProvider>
-              <Routes />
-            </AuthProvider>
-          </Container>
-          </MantineEmotionProvider>
-      </MantineProvider>
+    <MantineProvider theme={theme} defaultColorScheme="light">
+      <MantineEmotionProvider>
+        <Notifications position="top-right" autoClose={3000} limit={5} />
+        <Container fluid px={0} className="App">
+          <AuthProvider>
+            <Routes />
+          </AuthProvider>
+        </Container>
+      </MantineEmotionProvider>
+    </MantineProvider>
   );
 }
 

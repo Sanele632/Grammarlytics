@@ -8,7 +8,7 @@ const root = ReactDOM.createRoot(container as HTMLElement);
 
 root.render(
   <Router>
-    <MantineProvider> 
+    <MantineProvider>
       <App />
     </MantineProvider>
   </Router>

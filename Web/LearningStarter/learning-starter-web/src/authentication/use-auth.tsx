@@ -3,10 +3,14 @@ import { useAsyncRetry, useAsyncFn } from "react-use";
 import { ApiResponse } from "../constants/types";
 import { ApiError } from "../constants/types";
 import { LoginPage } from "../pages/login-page/login-page";
+import { UserCreate } from "../pages/user-page/user-create";
+import { LandingPage } from "../pages/landing-page/landing-page";
 import { UserDto } from "../constants/types";
 import { StatusCodes } from "../constants/status-codes";
 import { Loader } from "@mantine/core";
+import { Routes, Route, Navigate } from "react-router-dom";
 import api from "../config/axios";
+
 
 const currentUser = "currentUser";
 
@@ -41,6 +45,7 @@ export const AuthProvider = (props: any) => {
 
   //This is the main function for getting the user information from the database.
   //This function gets called on every "notify("user-login") in order to refetch the user data."
+
   const fetchCurrentUser = useAsyncRetry(async () => {
     setErrors([]);
 
@@ -90,10 +95,22 @@ export const AuthProvider = (props: any) => {
 
   //Brings unauthenticated users to the login page.
   //This can be made to bring them to a different part of the app eventually
-  if (!user && !fetchCurrentUser.loading) {
-    return <LoginPage fetchCurrentUser={fetchCurrentUser.retry} />;
-  }
 
+  if (!user && !fetchCurrentUser.loading) {
+    return (
+      <Routes>
+        <Route
+          path="/login"
+          element={<LoginPage fetchCurrentUser={fetchCurrentUser.retry} />}
+        />
+        <Route
+          path="/user/create"
+          element={<UserCreate fetchCurrentUser={fetchCurrentUser.retry} />}
+        />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    );
+  }
   //Once they are logged in and not loading, it brings them to the app.
   return (
     <AuthContext.Provider

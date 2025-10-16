@@ -1,6 +1,5 @@
 import { ApiResponse } from "../../constants/types";
 import { useAsyncFn } from "react-use";
-//import { PageWrapper } from "../../components/page-wrapper/page-wrapper";
 import { FormErrors, useForm, } from "@mantine/form";
 import {
   Alert,
@@ -13,12 +12,12 @@ import {
   Stack,
   Box,
   Divider,
-  createTheme
 } from "@mantine/core";
 import api from "../../config/axios";
 import { showNotification } from "@mantine/notifications";
 import { createStyles } from "@mantine/emotion";
-import { FcGoogle } from "react-icons/fc";
+import { Link, useNavigate } from "react-router-dom";
+import { PasswordInput } from "@mantine/core";
 
 type LoginRequest = {
   userName: string;
@@ -47,6 +46,7 @@ export const LoginPage = ({
     },
   });
 
+  const navigate = useNavigate();
   const [, submitLogin] = useAsyncFn(async (values: LoginRequest) => {
     const response = await api.post<LoginResponse>(`/api/authenticate`, values);
     if (response.data.hasErrors) {
@@ -67,7 +67,6 @@ export const LoginPage = ({
   }, []);
 
   return (
-    //<PageWrapper>
       <Container size="100%" className={classes.wrapper}>
         <Box className={classes.header}>
           <img
@@ -75,7 +74,7 @@ export const LoginPage = ({
             alt="Grammarlytics Logo"
             className={classes.logo}
           />
-          <Title order={1} className={classes.title}>
+          <Title order={1} className={classes.title} fw={400}>
             GRAMMARLYTICS
           </Title>
           <Text size="sm" color="dimmed" className={classes.subtitle}>
@@ -84,7 +83,7 @@ export const LoginPage = ({
         </Box>
 
         <Box className={classes.formBox}>
-          <Title order={4} ta="center" mb="md">
+          <Title order={4} ta="center" mb="md" fw={400}>
             Sign in to your account
           </Title>
 
@@ -107,8 +106,7 @@ export const LoginPage = ({
               </div>
 
               <div>
-                <Input
-                  type="password"
+                <PasswordInput
                   placeholder="Password"
                   {...form.getInputProps("password")}
                 />
@@ -117,20 +115,21 @@ export const LoginPage = ({
                 </Text>
               </div>
 
-              <Button fullWidth color='purple' type="submit">
+              <Button fullWidth color='purple.6' type="submit">
                 Sign in
               </Button>
             </Stack>
           </form>
 
-          <Divider label="or continue with" labelPosition="center" my="md" />
+          <Divider label="don't have an account?" labelPosition="center" my="md" />
 
           <Button
+            component={Link}   
+            to="/user/create"       
             variant="default"
-            leftSection={<FcGoogle size={20} />}
             fullWidth
           >
-            Google
+            Sign Up
           </Button>
 
           <Text size="xs" ta="center" mt="sm" color="dimmed">
@@ -146,7 +145,6 @@ export const LoginPage = ({
           </Text>
         </Box>
       </Container>
-    //</PageWrapper>
   );
 };
 

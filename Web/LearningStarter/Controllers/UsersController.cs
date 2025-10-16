@@ -156,7 +156,7 @@ public class UsersController : ControllerBase
             response.AddError("id", "Could not find user to edit.");
             return NotFound(response);
         }
-
+        
         if (string.IsNullOrEmpty(userUpdateDto.FirstName))
         {
             response.AddError("firstName", "First name cannot be empty.");
@@ -166,16 +166,16 @@ public class UsersController : ControllerBase
         {
             response.AddError("lastName", "Last name cannot be empty.");
         }
-
+        
         if (string.IsNullOrEmpty(userUpdateDto.UserName))
         {
             response.AddError("userName", "User name cannot be empty.");
         }
 
-        if (string.IsNullOrEmpty(userUpdateDto.Password))
-        {
-            response.AddError("password", "Password cannot be empty.");
-        }
+        //if (string.IsNullOrEmpty(userUpdateDto.Password))
+        //{
+        //    response.AddError("password", "Password cannot be empty.");
+        //}
 
         if (string.IsNullOrEmpty(userUpdateDto.Email))
         {

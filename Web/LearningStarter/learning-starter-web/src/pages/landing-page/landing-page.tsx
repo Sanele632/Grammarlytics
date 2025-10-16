@@ -47,16 +47,18 @@ export const LandingPage = () => {
       <Container size={980} className={classes.main}>
         <Text className={classes.title}>Let’s Get Started</Text>
 
-        <SegmentedControl
-          className={classes.segment}
-          data={[
-            { label: "Grammar Correction", value: "correction" },
-            { label: "Grammar Practice", value: "practice" },
-          ]}
-          value={tabValue}
-          onChange={handleSwitch}
-          radius="md"
-        />
+        <Box style={{ display: "flex", justifyContent: "center" }}>
+          <SegmentedControl
+            className={classes.segment}
+              data={[
+                { label: "Grammar Correction", value: "correction" },
+                { label: "Grammar Practice", value: "practice" },
+              ]}
+              value={tabValue}
+              onChange={handleSwitch}
+              radius="md"
+            />
+        </Box>
 
         <Text className={classes.sectionLabel}>
           What can we correct for you today, Joane?
@@ -112,7 +114,7 @@ export const LandingPage = () => {
 };
 
 const useStyles = createStyles(() => ({
-  page: { background: "#fff", minHeight: "100vh" },
+  page: { minHeight: "100vh" },
   main: { paddingTop: 12, paddingBottom: 40 },
 
   title: {

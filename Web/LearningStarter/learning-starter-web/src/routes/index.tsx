@@ -3,6 +3,8 @@ export const routes = {
   root: "/",
   home: "/",
   user: "/user",
+  userCreate: '/user/create',
+  userUpdate: '/user/:id',
   practice: "/practice", 
   dailyChallenge: "/daily-challenge",
   learningResources: "/learning-resources",

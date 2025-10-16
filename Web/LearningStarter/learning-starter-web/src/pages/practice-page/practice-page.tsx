@@ -34,16 +34,18 @@ export const PracticePage = () => {
       <Container size={980} className={classes.main}>
         <Text className={classes.title}>Grammar Practice</Text>
 
-        <SegmentedControl
-          className={classes.segment}
-          data={[
-            { label: "Grammar Correction", value: "correction" },
-            { label: "Grammar Practice", value: "practice" },
-          ]}
-          value={tabValue}
-          onChange={handleSwitch}
-          radius="md"
-        />
+        <Box style={{ display: "flex", justifyContent: "center" }}>
+          <SegmentedControl
+            className={classes.segment}
+            data={[
+              { label: "Grammar Correction", value: "correction" },
+              { label: "Grammar Practice", value: "practice" },
+            ]}
+            value={tabValue}
+            onChange={handleSwitch}
+            radius="md"
+          />
+        </Box>
 
         <Text className={classes.sectionLabel}>
           What would you like to practice today, Joane?

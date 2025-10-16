@@ -20,6 +20,32 @@ export interface UserDto {
   profilePicture: string;
 }
 
+export type UserGetDto = {
+  id: number;
+  firstName: string;
+  lastName: string;
+  userName: string;
+  email: string;
+  profilePicture: string;
+};
+
+export type UserFormValues = {
+  firstName: string;
+  lastName: string;
+  userName: string;
+  email: string;
+  profilePicture: string;
+}
+
+export type UserUpdateDto = {
+  firstName: string;
+  lastName: string;
+  userName: string;
+  email: string;
+  profilePicture: string;
+};
+
+
 // Add these two new interfaces
 export interface DailyChallengeDto {
   id: number;

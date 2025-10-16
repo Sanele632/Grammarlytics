@@ -8,27 +8,80 @@ import {
   Flex,
   Text,
   Title,
+  Loader,
+  Center,
+  useMantineColorScheme,
+  useMantineTheme,
+  Group,
+  Switch,
 } from "@mantine/core";
+import {
+  ApiResponse,
+  UserGetDto,
+} from "../../constants/types";
 import {
   IconUser,
   IconHistory,
   IconSettings,
   IconLock,
+  IconSun,
+  IconMoon,
+  IconMail,
 } from "@tabler/icons-react";
 import { createStyles } from "@mantine/emotion";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useUser } from "../../authentication/use-auth";
+import { Link } from "react-router-dom";
+import { showNotification } from "@mantine/notifications";
+import api from "../../config/axios";
 
 export const UserPage = () => {
-  const user = useUser();
-  const { classes, cx } = useStyles();
+  //const user = useUser();
+  const userContext = useUser();
+  const [user, setUser] = useState<any>(null);
+  const { classes } = useStyles();
   const [activeSection, setActiveSection] = useState("Profile");
+  const [loading, setLoading] = useState(true);
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  const dark = colorScheme === "dark";
+  
+  
+  
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        setLoading(true);
+        const response = await api.get<ApiResponse<UserGetDto>>(`/api/users/${userContext.id}`);
+        setUser(response.data.data);
+      } catch (error) {
+        console.error("Failed to fetch user:", error);
+        showNotification({ message: "Failed to load user", color: "red" });
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    if (!userContext.email || !userContext.profilePicture) {
+      fetchUser();
+    } else {
+      setUser(userContext);
+      setLoading(false);
+    }
+  }, [userContext]);
+
+  if (loading || !user) {
+    return (
+      <Center style={{ height: "100vh" }}>
+        <Loader color="purple.6" size="lg" variant="dots" />
+      </Center>
+    );
+  }
+
+  
   return (
     <Container size="md" className={classes.wrapper}>
-      {/* Page Title */}
-      <Title order={2} ta="center" mb="xl" c="purple">
+      <Title order={2} ta="center" mb="xl" c="purple.6" fw={400}>
         Profile
       </Title>
 
@@ -41,7 +94,7 @@ export const UserPage = () => {
         />
 
         <Flex direction="column" justify="center">
-          <Text fw={700} size="xl" lh={1.2}>
+          <Text fw={600} size="xl" lh={1.2} >
             {user.firstName} {user.lastName}
           </Text>
           <Text size="lg" c="dimmed">
@@ -99,11 +152,12 @@ export const UserPage = () => {
 
 const SidebarButton = ({ label, icon, active, onClick }: any) => {
   const { classes, cx } = useStyles();
+  
   return (
     <Button
       leftSection={icon}
-      variant={active ? "filled" : "subtle"}
-      color="purple"
+      variant = "subtle"
+      color="purple.6"
       className={cx(classes.sidebarButton, {
         [classes.activeButton]: active,
       })}
@@ -117,34 +171,32 @@ const SidebarButton = ({ label, icon, active, onClick }: any) => {
 const ProfileInfo = ({ user }: any) => (
   <Box>
     <Flex justify="space-between" align="center" mb="md">
-      <Text fw={600}>Name</Text>
-      <Flex align="center" gap={4}>
-        <IconLock size={16} color="green" />
-        <Text c="green" size="sm" style={{ cursor: "pointer" }}>
-          Change Password
-        </Text>
-      </Flex>
+      <Text mb="sm">
+      Personal Information
+      </Text>
+      <Button
+        variant="light"
+        color="green"
+        size="xs"
+        component={Link}
+        to={`/user/${user.id}`}
+        leftSection={<IconLock size={14} />}
+        radius="md"
+      >
+        Update Profile
+      </Button>
     </Flex>
     <Divider mb="md" />
-    <Text fw={500}>
+    <Text fw={500} size="md">
       {user.firstName} {user.lastName}
     </Text>
-    <Box mt="md">
-      <Text size="sm" fw={500}>
-        Verified email
-      </Text>
-      <Flex align="center" gap={4}>
-        <Text>{user.email}</Text>
-        <Text c="green">●</Text>
-      </Flex>
-      <Text size="xs" c="dimmed">
-        Account linked with Google
-      </Text>
-    </Box>
-    <Divider my="md" />
-    <Text size="sm" c="dimmed">
-      User since Sep 2025
+    <Text size="sm" c="dimmed" mb="xs">
+      @{user.userName}
     </Text>
+    <Flex align="center" gap={4}>
+      <IconMail size={16} />
+      <Text size="sm">{user.email}</Text>
+    </Flex>
   </Box>
 );
 
@@ -159,16 +211,45 @@ const HistorySection = () => (
   </Box>
 );
 
-const PreferencesSection = () => (
-  <Box>
-    <Title order={4} mb="sm">
-      Preferences
-    </Title>
-    <Text size="sm" c="dimmed">
-      (Add theme, notification, or language preferences here.)
-    </Text>
-  </Box>
-);
+const PreferencesSection = () => {
+  const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+  const dark = colorScheme === "dark";
+  const theme = useMantineTheme();
+
+  return (
+    <Card
+      withBorder
+      radius="md"
+      p="lg"
+      style={{
+        backgroundColor: dark
+          ? theme.colors.dark[6]
+          : theme.colors.gray[0],
+      }}
+    >
+      <Title order={4} mb="md">
+        Preferences
+      </Title>
+      <Group justify="space-between" align="center">
+        <Group>
+          {dark ? (
+            <IconMoon size={20} color={theme.colors.yellow[5]} />
+          ) : (
+            <IconSun size={20} color={theme.colors.yellow[5]} />
+          )}
+          <Text fw={500}>{dark ? "Dark Mode" : "Light Mode"}</Text>
+        </Group>
+        <Switch
+          checked={dark}
+          onChange={() => toggleColorScheme()}
+          color="purple"
+          size="md"
+        />
+      </Group>
+    </Card>
+  );
+};
+
 
 const useStyles = createStyles((theme) => ({
   wrapper: {
@@ -185,10 +266,14 @@ const useStyles = createStyles((theme) => ({
     justifyContent: "flex-start",
     width: "100%",
   },
+  
   activeButton: {
-    backgroundColor: theme.colors.violet[1],
-    color: theme.colors.violet[7],
+  borderLeft: `4px solid ${theme.colors.purple[7]}`, 
+  backgroundColor: "transparent",                   
+  color: theme.colors.purple[7],                    
+  paddingLeft: "calc(1rem - 4px)",                  
   },
+
   infoCard: {
     flex: 1,
     padding: theme.spacing.lg,
