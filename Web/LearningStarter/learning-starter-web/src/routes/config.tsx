@@ -26,7 +26,7 @@ export const Routes = () => {
           <Route path={routes.dailyChallenge} element={<DailyChallengePage />} />
           <Route path={routes.userUpdate} element={<UserUpdate />} />
           <Route path={routes.root} element={<Navigate to={routes.home} replace />} />
-          <Route path="*" element={<NotFoundPage />} />
+          <Route path="*" element={<LandingPage />} />
         </Switch>
       </PageWrapper>
     </>
