@@ -29,7 +29,6 @@ export const UserUpdate = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<UserGetDto | null>(null);
   const { id } = useParams();
-  const { refetchUser } = useAuth();
 
   const form = useForm<UserUpdateDto>({
     initialValues: {
