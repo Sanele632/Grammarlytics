@@ -166,10 +166,10 @@ public class Startup
         {
             var seededUser = new User
             {
-                FirstName = "Joan",
+                FirstName = "Joane",
                 LastName = "Mabrey",
                 UserName = "admin",
-                Email = "joanmabrey@gmail.com",
+                Email = "joanemabrey@gmail.com",
                 ProfilePicture = "https://images.unsplash.com/photo-1508002366005-75a695ee2d17?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fHdvbWFuJTIweW91bmd8ZW58MHx8MHx8fDA%3D&fm=jpg&q=60&w=3000"
 
             };

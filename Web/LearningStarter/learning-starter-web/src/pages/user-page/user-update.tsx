@@ -210,7 +210,6 @@ const useStyles = createStyles(() => ({
     alignItems: "center",
     justifyContent: "center",
     minHeight: "100vh",
-    backgroundColor: "#fff",
   },
 
   formBox: {

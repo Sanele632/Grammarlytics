@@ -160,7 +160,6 @@ export const LearningResourcesPage = () => {
 
 const useStyles = createStyles(() => ({
   page: {
-    background: "#fff",
     minHeight: "100vh",
     paddingTop: 30,
   },

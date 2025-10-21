@@ -121,7 +121,7 @@ export const PracticePage = () => {
 };
 
 const useStyles = createStyles(() => ({
-  page: { background: "#fff", minHeight: "100vh" },
+  page: { minHeight: "100vh" },
   main: { paddingTop: 12, paddingBottom: 40 },
   title: {
     textAlign: "center",
