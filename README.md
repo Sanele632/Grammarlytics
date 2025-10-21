@@ -18,6 +18,15 @@ Login with
 Username: admin
 Password: Password
 
-Notes:
-Sidebar should be added to navigation.tsx so we can include it on every page.
-We're using mantine for the frontend 
+
+Running AI:
+go to the colab notebook
+https://colab.research.google.com/drive/1J-0IPFIMXUgPXEKUppgOLuLSm_7MWRKd?usp=sharing
+create an ngrok account
+https://dashboard.ngrok.com/signup
+Once logged in, open the “Getting Started → Your Authtoken” page or go directly to
+https://dashboard.ngrok.com/get-started/your-authtoken
+run the first two cells in the colab notebook
+Once you run the second cell enter you ngrok authtoken in the input box
+Run the next cell to test that the API is running
+If that works everything will work on the website.
