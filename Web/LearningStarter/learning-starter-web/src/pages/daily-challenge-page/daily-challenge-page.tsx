@@ -97,7 +97,6 @@ export const DailyChallengePage = () => {
 
 const useStyles = createStyles(() => ({
   page: {
-    background: "#fff",
     minHeight: "100vh",
     paddingTop: 24,
     display: "flex",

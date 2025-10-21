@@ -9,7 +9,7 @@ import { PracticePage } from "../pages/practice-page/practice-page";
 import { LearningResourcesPage } from "../pages/learning-resources-page/learning-resources-page";
 import { DailyChallengePage } from "../pages/daily-challenge-page/daily-challenge-page";
 import { UserUpdate }  from "../pages/user-page/user-update";
-
+import { UserHistory }  from "../pages/user-page/user-history";
 //This is where you will tell React Router what to render when the path matches the route specified.
 export const Routes = () => {
   //Calling the useUser() from the use-auth.tsx in order to get user information
@@ -25,6 +25,7 @@ export const Routes = () => {
           <Route path={routes.learningResources} element={<LearningResourcesPage />} />
           <Route path={routes.dailyChallenge} element={<DailyChallengePage />} />
           <Route path={routes.userUpdate} element={<UserUpdate />} />
+          <Route path={routes.userHistory} element={<UserHistory />} />
           <Route path={routes.root} element={<Navigate to={routes.home} replace />} />
           <Route path="*" element={<LandingPage />} />
         </Switch>

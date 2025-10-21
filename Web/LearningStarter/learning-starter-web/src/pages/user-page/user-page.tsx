@@ -206,7 +206,17 @@ const HistorySection = () => (
       Grammar Practice History
     </Title>
     <Text size="sm" c="dimmed">
-      (show rewrites here.)
+      View your{" "}
+      <Text
+        component={Link}
+        to="/user/history"
+        c="purple.6"
+        fw={500}
+        style={{ textDecoration: "none" }}
+      >
+        full practice history
+      </Text>
+      .
     </Text>
   </Box>
 );
