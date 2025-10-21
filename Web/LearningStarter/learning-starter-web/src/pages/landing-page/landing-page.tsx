@@ -11,6 +11,10 @@ import {
 import { createStyles } from "@mantine/emotion";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { saveAs } from "file-saver";
+import { Document, Packer, Paragraph, TextRun } from "docx";
+import jsPDF from "jspdf";
+import { Menu } from "@mantine/core";
 
 const PURPLE = "#73268D";
 const CORRECTION_ROUTE = "/";          // home
@@ -20,6 +24,7 @@ export const LandingPage = () => {
   const { classes } = useStyles();
   const navigate = useNavigate();
   const location = useLocation();
+  const [loading, setLoading] = useState(false);
 
   const tabValue = location.pathname === PRACTICE_ROUTE ? "practice" : "correction";
 
@@ -33,13 +38,47 @@ export const LandingPage = () => {
   };
 
   const handleCorrectGrammar = async () => {
-    // TODO: call your backend, then setOutputText(responseText)
-    setOutputText(inputText); // placeholder
+    try {
+      setLoading(true);
+      setOutputText("AI is analyzing your text…");
+
+      const response = await fetch("https://promerger-personally-catrina.ngrok-free.dev/correct", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: inputText, tone }),
+      });
+
+      const data = await response.json();
+      setOutputText(data.corrected_text || "No response from model");
+    } catch (error) {
+      console.error("Error calling backend:", error);
+      setOutputText("Error connecting to grammar service");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSave = () => {
-    // TODO: save text
-    console.log("save", { inputText, outputText, tone });
+  const handleSave = (format: "pdf" | "docx") => {
+    if (!outputText) return;
+
+    if (format === "pdf") {
+      const doc = new jsPDF();
+      doc.text(outputText, 10, 10);
+      doc.save("corrected_text.pdf");
+    } else if (format === "docx") {
+      const doc = new Document({
+        sections: [
+          {
+            properties: {},
+            children: [new Paragraph({ children: [new TextRun(outputText)] })],
+          },
+        ],
+      });
+
+      Packer.toBlob(doc).then((blob) => {
+        saveAs(blob, "corrected_text.docx");
+      });
+    }
   };
 
   return (
@@ -95,7 +134,7 @@ export const LandingPage = () => {
         </Text>
 
         <Textarea
-          className={classes.card}
+          className={`${classes.card} ${loading ? classes.loading : ""}`}
           minRows={8}
           autosize
           value={outputText}
@@ -104,9 +143,16 @@ export const LandingPage = () => {
         />
 
         <Group justify="center" mt="lg">
-          <Button className={classes.saveBtn} onClick={handleSave}>
-            Save Text
-          </Button>
+          <Menu shadow="md" width={200}>
+            <Menu.Target>
+              <Button className={classes.saveBtn}>Save Text</Button>
+            </Menu.Target>
+
+            <Menu.Dropdown>
+              <Menu.Item onClick={() => handleSave("pdf")}>Save as PDF</Menu.Item>
+              <Menu.Item onClick={() => handleSave("docx")}>Save as Word</Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
         </Group>
       </Container>
     </Box>
@@ -155,7 +201,19 @@ const useStyles = createStyles(() => ({
     boxShadow: "0px 4px 60px rgba(0,0,0,0.15)",
     padding: 10,
     textarea: { borderRadius: 24, padding: 16, fontSize: 14 },
+    transition: "background-color 0.5s",
   },
+
+  loading: { 
+    animation: "$colorFade 1.5s infinite",
+  },
+
+  "@keyframes colorFade": { 
+    "0%": { backgroundColor: "#F7F7F7" },      // light gray
+    "50%": { backgroundColor: "#D6C0E0" },     // soft purple
+    "100%": { backgroundColor: "#FFFFFF" },    // white
+  },
+
 
   pillBtn: {
     background: "#F7F7F7",
