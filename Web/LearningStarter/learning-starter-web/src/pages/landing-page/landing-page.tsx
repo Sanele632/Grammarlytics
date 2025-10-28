@@ -7,6 +7,7 @@ import {
   Group,
   Button,
   Select,
+  Menu,
 } from "@mantine/core";
 import { createStyles } from "@mantine/emotion";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -14,7 +15,6 @@ import { useState } from "react";
 import { saveAs } from "file-saver";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 import jsPDF from "jspdf";
-import { Menu } from "@mantine/core";
 
 const PURPLE = "#73268D";
 const CORRECTION_ROUTE = "/";          // home
@@ -26,7 +26,8 @@ export const LandingPage = () => {
   const location = useLocation();
   const [loading, setLoading] = useState(false);
 
-  const tabValue = location.pathname === PRACTICE_ROUTE ? "practice" : "correction";
+  const tabValue =
+    location.pathname === PRACTICE_ROUTE ? "practice" : "correction";
 
   const [inputText, setInputText] = useState("");
   const [tone, setTone] = useState<string | null>(null);
@@ -42,11 +43,14 @@ export const LandingPage = () => {
       setLoading(true);
       setOutputText("AI is analyzing your text…");
 
-      const response = await fetch("https://promerger-personally-catrina.ngrok-free.dev/correct", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: inputText, tone }),
-      });
+      const response = await fetch(
+        "https://e47e098a8435.ngrok-free.app",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: inputText, tone }),
+        }
+      );
 
       const data = await response.json();
       setOutputText(data.corrected_text || "No response from model");
@@ -89,14 +93,14 @@ export const LandingPage = () => {
         <Box style={{ display: "flex", justifyContent: "center" }}>
           <SegmentedControl
             className={classes.segment}
-              data={[
-                { label: "Grammar Correction", value: "correction" },
-                { label: "Grammar Practice", value: "practice" },
-              ]}
-              value={tabValue}
-              onChange={handleSwitch}
-              radius="md"
-            />
+            data={[
+              { label: "Grammar Correction", value: "correction" },
+              { label: "Grammar Practice", value: "practice" },
+            ]}
+            value={tabValue}
+            onChange={handleSwitch}
+            radius="md"
+          />
         </Box>
 
         <Text className={classes.sectionLabel}>
@@ -107,7 +111,7 @@ export const LandingPage = () => {
           className={classes.card}
           minRows={8}
           autosize
-          placeholder="Start writing here..."
+          placeholder="Start writing here."
           value={inputText}
           onChange={(e) => setInputText(e.currentTarget.value)}
           styles={{ input: { background: "#F7F7F7", border: "none" } }}
@@ -204,16 +208,15 @@ const useStyles = createStyles(() => ({
     transition: "background-color 0.5s",
   },
 
-  loading: { 
+  loading: {
     animation: "$colorFade 1.5s infinite",
   },
 
-  "@keyframes colorFade": { 
-    "0%": { backgroundColor: "#F7F7F7" },      // light gray
-    "50%": { backgroundColor: "#D6C0E0" },     // soft purple
-    "100%": { backgroundColor: "#FFFFFF" },    // white
+  "@keyframes colorFade": {
+    "0%": { backgroundColor: "#F7F7F7" },
+    "50%": { backgroundColor: "#D6C0E0" },
+    "100%": { backgroundColor: "#FFFFFF" },
   },
-
 
   pillBtn: {
     background: "#F7F7F7",
