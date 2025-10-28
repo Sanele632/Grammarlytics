@@ -1,11 +1,66 @@
-import {Box, Container, Text, SegmentedControl, Select, Textarea, Group, Button} from "@mantine/core";
+import {
+  Box,
+  Container,
+  Text,
+  SegmentedControl,
+  Select,
+  Textarea,
+  Group,
+  Button,
+  Loader,
+  Alert,
+} from "@mantine/core";
 import { createStyles } from "@mantine/emotion";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
+/** ========================
+ *  CONFIG
+ *  ======================== */
+const NGROK_URL = "https://e47e098a8435.ngrok-free.app"; // update when Colab prints new URL
 const PURPLE = "#73268D";
 const HOME = "/";
 const PRACTICE = "/practice";
+
+/** Backend item shape from /practice/generate */
+type PracticeItem = {
+  incorrect: string;
+  corrected: string;
+  mistake_type: string;
+  explanation: string;
+};
+
+/** Topics sent to backend */
+const TOPIC_OPTIONS = [
+  { label: "Commas", value: "Commas" },
+  { label: "Subject–Verb Agreement", value: "Subject–Verb Agreement" },
+  { label: "Pronouns", value: "Pronouns" },
+  { label: "Modifiers", value: "Modifiers" },
+  { label: "Parallelism", value: "Parallelism" },
+  { label: "Verb Tense", value: "Verb Tense" },
+] as const;
+
+function normalize(s: string): string {
+  return s
+    .trim()
+    .replace(/\s*,\s*/g, ", ")
+    .replace(/\s*;\s*/g, "; ")
+    .replace(/\s*\.\s*$/g, ".")
+    .replace(/\s+/g, " ")
+    .toLowerCase();
+}
+
+function acceptableAlternatives(expected: string): string[] {
+  const e = expected.trim();
+  const alts = [e];
+  const m = e.match(/^(.*),\s+(and|but|or|nor|for|so|yet)\s+(.*)$/i);
+  if (m) {
+    const left = m[1].replace(/\s*\.\s*$/, "");
+    const right = m[3].replace(/^\s*/, "");
+    alts.push(`${left}; ${right}.`);
+  }
+  return alts;
+}
 
 export const PracticePage = () => {
   const { classes } = useStyles();
@@ -20,13 +75,105 @@ export const PracticePage = () => {
   const [prompt, setPrompt] = useState("");
   const [answer, setAnswer] = useState("");
   const [solution, setSolution] = useState("");
+  const [keyItem, setKeyItem] = useState<PracticeItem | null>(null);
+  const [loadingPrompt, setLoadingPrompt] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleCheck = () => {
-    setSolution(
-      answer.trim()
-        ? "Looks good! (stub)\nWe’ll grade this once the API is wired."
-        : "Try writing an answer first 🙂"
-    );
+  const jsonHeaders = useMemo(() => ({ "Content-Type": "application/json" }), []);
+
+  async function fetchPractice(topicKey: string): Promise<PracticeItem | null> {
+    const res = await fetch(`${NGROK_URL}/practice/generate`, {
+      method: "POST",
+      headers: jsonHeaders,
+      body: JSON.stringify({ topic: topicKey, level: "medium", n: 1 }),
+    });
+    if (!res.ok) throw new Error(`Practice API error ${res.status}`);
+    const data = await res.json();
+    return (data?.items?.[0] ?? null) as PracticeItem | null;
+  }
+
+  async function correctAnswerAPI(text: string): Promise<string> {
+    const res = await fetch(`${NGROK_URL}/correct`, {
+      method: "POST",
+      headers: jsonHeaders,
+      body: JSON.stringify({ text }),
+    });
+    if (!res.ok) throw new Error(`Correct API error ${res.status}`);
+    const data = await res.json();
+    return String(data?.corrected_text ?? "");
+  }
+
+  const handleTopicChange = async (v: string | null) => {
+    setTopic(v);
+    setAnswer("");
+    setSolution("");
+    setKeyItem(null);
+    setError(null);
+
+    if (!v) {
+      setPrompt("");
+      return;
+    }
+
+    try {
+      setLoadingPrompt(true);
+      const item = await fetchPractice(v);
+      setKeyItem(item);
+      setPrompt(item?.incorrect ?? "");
+      if (!item) setError("Couldn’t get a practice sentence. Try again.");
+    } catch (e: any) {
+      setError(e?.message || "Failed to load practice sentence.");
+      setPrompt("");
+    } finally {
+      setLoadingPrompt(false);
+    }
+  };
+
+  const handleCheck = async () => {
+    setError(null);
+    setSolution("");
+
+    if (!answer.trim()) {
+      setSolution("Try writing an answer first 🙂");
+      return;
+    }
+    const expected = keyItem?.corrected?.trim() ?? "";
+    if (!expected) {
+      setSolution("No expected solution loaded. Try generating a new sentence.");
+      return;
+    }
+
+    setChecking(true);
+    try {
+      const backendCorr = await correctAnswerAPI(answer);
+      const expSet = acceptableAlternatives(expected).map(normalize);
+      const ok =
+        expSet.includes(normalize(backendCorr)) ||
+        expSet.includes(normalize(answer));
+
+      setSolution(
+        (ok ? "✅ Correct!\n\n" : "🟡 Not quite. One acceptable fix is:\n") +
+          expected +
+          (keyItem?.explanation ? `\n\n${keyItem.explanation}` : "")
+      );
+    } catch (e: any) {
+      const expSet = acceptableAlternatives(expected).map(normalize);
+      const ok = expSet.includes(normalize(answer));
+      setSolution(
+        (ok ? "✅ Correct!\n\n" : "🟡 Not quite. One acceptable fix is:\n") +
+          expected +
+          (keyItem?.explanation ? `\n\n${keyItem.explanation}` : "")
+      );
+      setError(e?.message || "Failed to check your answer (used fallback).");
+    } finally {
+      setChecking(false);
+    }
+  };
+
+  const regeneratePrompt = async () => {
+    if (!topic) return;
+    await handleTopicChange(topic);
   };
 
   return (
@@ -47,32 +194,35 @@ export const PracticePage = () => {
           />
         </Box>
 
+        {error && (
+          <Alert color="red" mb="sm" variant="light">
+            {error}
+          </Alert>
+        )}
+
         <Text className={classes.sectionLabel}>
           What would you like to practice today, Joane?
         </Text>
-        <Select
-          className={classes.selectPill}
-          placeholder="Choose a topic..."
-          data={[
-            "Commas",
-            "Subject–Verb Agreement",
-            "Pronouns",
-            "Modifiers",
-            "Parallelism",
-            "Verb Tense",
-          ]}
-          value={topic}
-          onChange={(v) => {
-            setTopic(v);
-            setPrompt(
-              v
-                ? "Each of the players on the team have practiced hard for the game."
-                : ""
-            );
-            setAnswer("");
-            setSolution("");
-          }}
-        />
+
+        <Group justify="center" mb={4} gap="sm">
+          <Select
+            className={classes.selectPill}
+            placeholder="Choose a topic..."
+            data={TOPIC_OPTIONS}
+            value={topic}
+            onChange={handleTopicChange}
+            searchable
+            nothingFoundMessage="No topics"
+          />
+          <Button
+            className={classes.pillBtn}
+            onClick={regeneratePrompt}
+            disabled={!topic || loadingPrompt}
+            title={!topic ? "Pick a topic first" : "Generate a new sentence"}
+          >
+            {loadingPrompt ? <Loader size="sm" /> : "New sentence"}
+          </Button>
+        </Group>
 
         <Text className={classes.sectionLabel} mt="sm">
           Correct this statement
@@ -83,7 +233,9 @@ export const PracticePage = () => {
           autosize
           value={prompt}
           onChange={(e) => setPrompt(e.currentTarget.value)}
+          placeholder="Select a topic to generate a sentence…"
           styles={{ input: { background: "#F7F7F7", border: "none" } }}
+          readOnly
         />
 
         <Text className={classes.sectionLabel} mt="sm">
@@ -95,12 +247,18 @@ export const PracticePage = () => {
           autosize
           value={answer}
           onChange={(e) => setAnswer(e.currentTarget.value)}
+          placeholder="Rewrite the sentence with correct grammar…"
           styles={{ input: { background: "#F7F7F7", border: "none" } }}
         />
 
         <Group justify="center" mt="md">
-          <Button className={classes.pillBtn} onClick={handleCheck}>
-            Check Answer
+          <Button
+            className={classes.pillBtn}
+            onClick={handleCheck}
+            disabled={checking || !answer.trim() || !keyItem}
+            title={!keyItem ? "Generate a sentence first" : "Check your answer"}
+          >
+            {checking ? <Loader size="sm" /> : "Check Answer"}
           </Button>
         </Group>
 
@@ -113,15 +271,16 @@ export const PracticePage = () => {
           autosize
           value={solution}
           onChange={(e) => setSolution(e.currentTarget.value)}
+          placeholder="The solution and feedback will appear here."
           styles={{ input: { background: "#F7F7F7", border: "none" } }}
         />
       </Container>
-    </Box>
+        </Box>
   );
 };
 
 const useStyles = createStyles(() => ({
-  page: { minHeight: "100vh" },
+  page: { background: "#fff", minHeight: "100vh" },
   main: { paddingTop: 12, paddingBottom: 40 },
   title: {
     textAlign: "center",
@@ -141,13 +300,13 @@ const useStyles = createStyles(() => ({
       borderRadius: 6,
     },
     ".mantine-SegmentedControl-label": {
-      color: "#73268D",
+      color: PURPLE,
       fontWeight: 500,
       fontSize: 14,
     },
   },
   sectionLabel: {
-    color: "#73268D",
+    color: PURPLE,
     fontWeight: 500,
     fontSize: 16,
     marginTop: 4,
@@ -161,7 +320,7 @@ const useStyles = createStyles(() => ({
   },
   pillBtn: {
     background: "#F7F7F7",
-    color: "#73268D",
+    color: PURPLE,
     border: "none",
     height: 42,
     paddingInline: 28,
@@ -169,6 +328,7 @@ const useStyles = createStyles(() => ({
     boxShadow: "0px 4px 25px rgba(0,0,0,0.25)",
     fontWeight: 500,
     "&:hover": { background: "#eee" },
+    "&[data-disabled]": { opacity: 0.6, cursor: "not-allowed" },
   },
   selectPill: {
     maxWidth: 380,
@@ -179,8 +339,12 @@ const useStyles = createStyles(() => ({
       height: 38,
       borderRadius: 999,
       paddingInline: 16,
-      boxShadow: "0px 4px 25px rgba(0,0,0,0.15)",
+      color: PURPLE,
+      fontWeight: 500,
     },
-    ".mantine-Select-dropdown": { borderRadius: 12 },
+    ".mantine-Select-dropdown": {
+      borderRadius: 12,
+      boxShadow: "0px 4px 20px rgba(0,0,0,0.1)",
+    },
   },
 }));
