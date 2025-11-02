@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Container,
   Group,
@@ -8,8 +8,14 @@ import {
   Menu,
   ActionIcon,
   Title,
+  Loader,
+  Center,
   useMantineColorScheme,
 } from "@mantine/core";
+import {
+  ApiResponse,
+  UserGetDto,
+} from "../../constants/types";
 import { IconMenu2, IconFlameFilled, IconUser } from "@tabler/icons-react";
 import { NavLink, Link } from "react-router-dom";
 import { routes } from "../../routes";
@@ -18,19 +24,48 @@ import logo from "../../assets/full logo.png";
 import { createStyles } from "@mantine/emotion";
 import { Sidebar } from "../navigation/sidebar";
 import { UserDto } from "../../constants/types";
+import { useUser } from "../../authentication/use-auth";
+import api from "../../config/axios";
+import { showNotification } from "@mantine/notifications";
 
 type PrimaryNavigationProps = {
   user?: UserDto;
 };
 
-export const PrimaryNavigation: React.FC<PrimaryNavigationProps> = ({
-  user,
-}) => {
+export const PrimaryNavigation: React.FC<PrimaryNavigationProps> = () => {
+  const userContext = useUser();
+  const [user, setUser] = useState<any>(null);
   const { classes } = useStyles();
   const { logout } = useAuth();
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const dark = colorScheme === "dark";
   const [sidebarOpened, setSidebarOpened] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+        const fetchUser = async () => {
+          try {
+            setLoading(true);
+            const response = await api.get<ApiResponse<UserGetDto>>(`/api/users/${userContext.id}`);
+            setUser(response.data.data);
+          } catch (error) {
+            console.error("Failed to fetch user:", error);
+            showNotification({ message: "Failed to load user", color: "red" });
+          } finally {
+            setLoading(false);
+          }
+        };
+    
+        fetchUser();
+      }, [userContext.id]);
+
+  if (loading || !user) {
+    return (
+      <Center style={{ height: "100vh" }}>
+        <Loader color="purple.6" size="lg" variant="dots" />
+      </Center>
+    );
+  }
 
   return (
     <>
@@ -54,14 +89,19 @@ export const PrimaryNavigation: React.FC<PrimaryNavigationProps> = ({
             <Flex align="center" gap="sm">
               <Flex align="center" gap={4}>
                 <IconFlameFilled color="orange" size={20} />
-                <span style={{ fontWeight: 600, color: "orange" }}>6</span>
+                <span style={{ fontWeight: 600, color: "orange" }}>{user.streakCount}</span>
               </Flex>
               <span>Welcome Back, {user.firstName}!</span>
               <Menu>
                 <Menu.Target>
-                  <Avatar className={classes.pointer}>
-                    {user.firstName[0]}
-                    {user.lastName[0]}
+                  <Avatar
+                    src={user.profilePicture || undefined}
+                    alt={`${user.firstName} ${user.lastName}`}
+                    radius="xl"
+                    color="purple"
+                  >
+                    {!user.profilePicture &&
+                      `${user.firstName?.[0] ?? ""}${user.lastName?.[0] ?? ""}`.toUpperCase()}
                   </Avatar>
                 </Menu.Target>
                 <Menu.Dropdown>

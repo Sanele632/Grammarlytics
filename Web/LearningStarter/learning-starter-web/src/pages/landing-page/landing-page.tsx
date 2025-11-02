@@ -12,6 +12,7 @@ import {
 import { createStyles } from "@mantine/emotion";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useUser } from "../../authentication/use-auth";
 import { saveAs } from "file-saver";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 import jsPDF from "jspdf";
@@ -25,6 +26,7 @@ export const LandingPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
+  const user = useUser();
 
   const tabValue =
     location.pathname === PRACTICE_ROUTE ? "practice" : "correction";
@@ -104,7 +106,7 @@ export const LandingPage = () => {
         </Box>
 
         <Text className={classes.sectionLabel}>
-          What can we correct for you today, Joane?
+          What can we correct for you today, {user.firstName}?
         </Text>
 
         <Textarea

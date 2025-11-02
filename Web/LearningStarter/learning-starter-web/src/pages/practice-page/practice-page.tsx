@@ -13,6 +13,7 @@ import {
 import { createStyles } from "@mantine/emotion";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useMemo, useState } from "react";
+import { useUser } from "../../authentication/use-auth";
 
 /** ========================
  *  CONFIG
@@ -66,6 +67,7 @@ export const PracticePage = () => {
   const { classes } = useStyles();
   const navigate = useNavigate();
   const location = useLocation();
+  const user = useUser();
 
   const tabValue = location.pathname === PRACTICE ? "practice" : "correction";
   const handleSwitch = (val: string) =>
@@ -201,7 +203,7 @@ export const PracticePage = () => {
         )}
 
         <Text className={classes.sectionLabel}>
-          What would you like to practice today, Joane?
+          What would you like to practice today, {user.firstName}?
         </Text>
 
         <Group justify="center" mb={4} gap="sm">
@@ -280,7 +282,7 @@ export const PracticePage = () => {
 };
 
 const useStyles = createStyles(() => ({
-  page: { background: "#fff", minHeight: "100vh" },
+  page: { minHeight: "100vh" },
   main: { paddingTop: 12, paddingBottom: 40 },
   title: {
     textAlign: "center",

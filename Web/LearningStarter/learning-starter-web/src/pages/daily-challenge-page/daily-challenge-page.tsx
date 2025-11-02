@@ -3,24 +3,31 @@ import {
   Text,
   Title,
   Box,
+  Loader,
+  Center,
   Textarea,
   Button,
-  Center,
   Group,
 } from "@mantine/core";
 import { createStyles } from "@mantine/emotion";
 import { IconCircleCheck, IconCircle } from "@tabler/icons-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  ApiResponse,
+  UserGetDto,
+} from "../../constants/types";
+import { useUser } from "../../authentication/use-auth";
+import { showNotification } from "@mantine/notifications";
+import api from "../../config/axios";
 
-const PURPLE = "#73268D";
 
 export const DailyChallengePage = () => {
+  const userContext = useUser();
+  const [user, setUser] = useState<any>(null);
   const { classes, cx } = useStyles();
-
   const [answer, setAnswer] = useState("");
-
+  const [loading, setLoading] = useState(true);
   const week = [true, true, true, true, true, false, false];
-
   const niceDate = useMemo(
     () =>
       new Date().toLocaleDateString("en-US", {
@@ -29,6 +36,31 @@ export const DailyChallengePage = () => {
       }),
     []
   );
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        setLoading(true);
+        const response = await api.get<ApiResponse<UserGetDto>>(`/api/users/${userContext.id}`);
+        setUser(response.data.data);
+      } catch (error) {
+        console.error("Failed to fetch user:", error);
+        showNotification({ message: "Failed to load user", color: "red" });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [userContext.id]);
+
+  if (loading || !user) {
+    return (
+      <Center style={{ height: "100vh" }}>
+        <Loader color="purple.6" size="lg" variant="dots" />
+      </Center>
+    );
+  }
 
   return (
     <Container className={classes.page}>
@@ -54,7 +86,7 @@ export const DailyChallengePage = () => {
           Streak Count
         </Text>
         <Group gap={6} align="center" justify="center" mt={4}>
-          <Text fw={700}>6</Text>
+          <Text fw={700}>{user.streakCount}</Text>
           <Text>🔥</Text>
         </Group>
       </Box>
@@ -105,7 +137,7 @@ const useStyles = createStyles(() => ({
   },
 
   title: {
-    color: PURPLE,
+    color: "purple",
     fontWeight: 500,
     fontSize: 32,
     marginBottom: 12,
@@ -148,7 +180,7 @@ const useStyles = createStyles(() => ({
     minWidth: 140,
   },
   dateText: {
-    color: PURPLE,
+    color: "purple",
     fontWeight: 700,
     marginBottom: 16,
   },
@@ -160,7 +192,7 @@ const useStyles = createStyles(() => ({
     alignItems: "center",
   },
   helperText: {
-    color: PURPLE,
+    color: "purple",
     fontWeight: 500,
     textAlign: "center",
     marginBottom: 12,
@@ -174,7 +206,7 @@ const useStyles = createStyles(() => ({
   },
   promptArea: { marginBottom: 18 },
   inputLabel: {
-    color: PURPLE,
+    color: "purple",
     fontWeight: 500,
     margin: "4px 0 8px",
     alignSelf: "flex-start",
@@ -183,7 +215,7 @@ const useStyles = createStyles(() => ({
 
   pillBtn: {
     background: "#F7F7F7",
-    color: PURPLE,
+    color: "purple",
     border: "none",
     height: 40,
     paddingInline: 28,

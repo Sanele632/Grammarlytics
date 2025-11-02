@@ -36,6 +36,7 @@ public class UsersController : ControllerBase
                 LastName = x.LastName,
                 UserName = x.UserName,
                 Email = x.Email,
+                StreakCount = x.StreakCount,
                 ProfilePicture = x.ProfilePicture
             })
             .ToList();
@@ -64,6 +65,7 @@ public class UsersController : ControllerBase
             LastName = user.LastName,
             UserName = user.UserName,
             Email = user.Email,
+            StreakCount = user.StreakCount,
             ProfilePicture = user.ProfilePicture
         };
 
