@@ -37,7 +37,6 @@ import { showNotification } from "@mantine/notifications";
 import api from "../../config/axios";
 
 export const UserPage = () => {
-  //const user = useUser();
   const userContext = useUser();
   const [user, setUser] = useState<any>(null);
   const { classes } = useStyles();
@@ -46,29 +45,22 @@ export const UserPage = () => {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
   const dark = colorScheme === "dark";
   
-  
-  
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        setLoading(true);
-        const response = await api.get<ApiResponse<UserGetDto>>(`/api/users/${userContext.id}`);
-        setUser(response.data.data);
-      } catch (error) {
-        console.error("Failed to fetch user:", error);
-        showNotification({ message: "Failed to load user", color: "red" });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (!userContext.email || !userContext.profilePicture) {
+      const fetchUser = async () => {
+        try {
+          setLoading(true);
+          const response = await api.get<ApiResponse<UserGetDto>>(`/api/users/${userContext.id}`);
+          setUser(response.data.data);
+        } catch (error) {
+          console.error("Failed to fetch user:", error);
+          showNotification({ message: "Failed to load user", color: "red" });
+        } finally {
+          setLoading(false);
+        }
+      };
+  
       fetchUser();
-    } else {
-      setUser(userContext);
-      setLoading(false);
-    }
-  }, [userContext]);
+    }, [userContext.id]);
 
   if (loading || !user) {
     return (

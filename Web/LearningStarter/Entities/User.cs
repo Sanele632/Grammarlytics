@@ -12,7 +12,7 @@ public class User : IdentityUser<int>
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public string? ProfilePicture { get; set; }
-     public int StreakCount { get; set; } = 0;
+    public int StreakCount { get; set; } = 0;
     public DateOnly? LastChallengeDate { get; set; }
 
 
@@ -39,7 +39,9 @@ public class UserUpdateDto
     public string UserName { get; set; }
     public string Password { get; set; }
     public string Email { get; set; }
+    public int StreakCount { get; set; } = 0;
     public string ProfilePicture { get; set; }
+    
 }
 
 public class UserGetDto
@@ -49,6 +51,7 @@ public class UserGetDto
     public string LastName { get; set; }
     public string UserName { get; set; }
     public string Email { get; set; }
+    public int StreakCount { get; set; } = 0;
     public string ProfilePicture { get; set; }
 }
 

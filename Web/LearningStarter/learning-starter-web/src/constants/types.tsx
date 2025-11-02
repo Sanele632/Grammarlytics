@@ -26,6 +26,7 @@ export type UserGetDto = {
   lastName: string;
   userName: string;
   email: string;
+  StreakCount: number;
   profilePicture: string;
 };
 
