@@ -1,9 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Configurations>Debug;Release;LearningStarterServer</Configurations>
     <Platforms>AnyCPU</Platforms>
+    <UserSecretsId>9e085357-64a1-4dad-8b62-b196118514fa</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
