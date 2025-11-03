@@ -147,5 +147,6 @@ export const mapUser = (user: any): UserDto => ({
   lastName: user.lastName,
   userName: user.userName,
   email: user.email,
+  streakCount: user.streakCount,
   profilePicture: user.profilePicture
 });

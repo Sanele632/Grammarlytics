@@ -101,13 +101,16 @@ public class Startup
         // configure DI for application services
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
+        services.AddHttpClient();
+        services.AddScoped<IAIChallengeService, AIChallengeService>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DataContext dataContext)
     {
-        dataContext.Database.EnsureDeleted();
-        dataContext.Database.EnsureCreated();
+        //dataContext.Database.EnsureDeleted();
+        //dataContext.Database.EnsureCreated();
+        dataContext.Database.Migrate();
         
         app.UseHsts();
         app.UseHttpsRedirection();
