@@ -1,4 +1,3 @@
-// src/pages/landing-page/landing-page.tsx
 import {
   Container,
   Text,
@@ -15,6 +14,7 @@ import {
 import { createStyles } from "@mantine/emotion";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
+import { useUser } from "../../authentication/use-auth";
 import { saveAs } from "file-saver";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 import jsPDF from "jspdf";
@@ -30,6 +30,7 @@ export const LandingPage = () => {
   const { classes } = useStyles();
   const navigate = useNavigate();
   const location = useLocation();
+  const user = useUser();
 
   const tabValue =
     location.pathname === PRACTICE_ROUTE ? "practice" : "correction";
@@ -91,7 +92,7 @@ export const LandingPage = () => {
         setErr(`Backend error ${res.status}: ${msg}`);
         setOutputText("");
         return;
-        }
+      }
 
       const corrected = (data as any)?.corrected_text;
       if (!corrected) {
@@ -156,7 +157,7 @@ export const LandingPage = () => {
         )}
 
         <Text className={classes.sectionLabel}>
-          What can we correct for you today, Joane?
+          What can we correct for you today, {user?.firstName ?? "there"}?
         </Text>
 
         <Textarea
