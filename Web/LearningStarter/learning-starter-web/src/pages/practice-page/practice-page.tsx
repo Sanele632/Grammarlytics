@@ -17,7 +17,7 @@ import { useMemo, useState } from "react";
 /** ========================
  *  CONFIG
  *  ======================== */
-const NGROK_URL = "https://e47e098a8435.ngrok-free.app"; // update when Colab prints new URL
+const NGROK_URL = "https://9f013a6a5557.ngrok-free.app"; // update when Colab prints new URL
 const PURPLE = "#73268D";
 const HOME = "/";
 const PRACTICE = "/practice";
@@ -280,11 +280,14 @@ export const PracticePage = () => {
 };
 
 const useStyles = createStyles(() => ({
-  page: { background: "#fff", minHeight: "100vh" },
+  page: { 
+    background: "linear-gradient(180deg, #F4E8F9 0%, #F8ECFF 100%)", // soft purple gradient
+    minHeight: "100vh" 
+  },
   main: { paddingTop: 12, paddingBottom: 40 },
   title: {
     textAlign: "center",
-    color: PURPLE,
+    color: "#73268D",
     fontWeight: 300,
     fontSize: 40,
     margin: "12px 0",
@@ -300,13 +303,13 @@ const useStyles = createStyles(() => ({
       borderRadius: 6,
     },
     ".mantine-SegmentedControl-label": {
-      color: PURPLE,
+      color: "#73268D",
       fontWeight: 500,
       fontSize: 14,
     },
   },
   sectionLabel: {
-    color: PURPLE,
+    color: "#73268D",
     fontWeight: 500,
     fontSize: 16,
     marginTop: 4,
@@ -320,7 +323,7 @@ const useStyles = createStyles(() => ({
   },
   pillBtn: {
     background: "#F7F7F7",
-    color: PURPLE,
+    color: "#73268D",
     border: "none",
     height: 42,
     paddingInline: 28,
@@ -339,12 +342,8 @@ const useStyles = createStyles(() => ({
       height: 38,
       borderRadius: 999,
       paddingInline: 16,
-      color: PURPLE,
-      fontWeight: 500,
+      boxShadow: "0px 4px 25px rgba(0,0,0,0.15)",
     },
-    ".mantine-Select-dropdown": {
-      borderRadius: 12,
-      boxShadow: "0px 4px 20px rgba(0,0,0,0.1)",
-    },
+    ".mantine-Select-dropdown": { borderRadius: 12 },
   },
 }));
