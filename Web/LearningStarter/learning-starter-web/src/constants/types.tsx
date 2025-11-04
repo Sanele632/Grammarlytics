@@ -17,6 +17,7 @@ export interface UserDto {
   lastName: string;
   userName: string;
   email: string;
+  streakCount: number;
   profilePicture: string;
 }
 
@@ -26,6 +27,7 @@ export type UserGetDto = {
   lastName: string;
   userName: string;
   email: string;
+  streakCount: number;
   profilePicture: string;
 };
 
@@ -45,12 +47,11 @@ export type UserUpdateDto = {
   profilePicture: string;
 };
 
-
-// Add these two new interfaces
-export interface DailyChallengeDto {
+export interface DailyChallengeGetDto {
   id: number;
   date: string;
   incorrectSentence: string;
+  correctSentence: string;
 }
 
 export interface LearningResourceDto {

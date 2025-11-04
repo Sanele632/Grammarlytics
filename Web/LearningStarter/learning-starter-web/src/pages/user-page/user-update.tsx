@@ -26,6 +26,7 @@ import { useAuth } from "../../authentication/use-auth";
 export const UserUpdate = () => {
   const { classes } = useStyles();
   const navigate = useNavigate();
+  const { refetchUser } = useAuth();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<UserGetDto | null>(null);
   const { id } = useParams();
@@ -90,6 +91,7 @@ export const UserUpdate = () => {
         `/api/users/${id}`,
         values
       );
+      await refetchUser();
 
       if (response.data.hasErrors) {
         const formErrors: FormErrors = response.data.errors.reduce(
