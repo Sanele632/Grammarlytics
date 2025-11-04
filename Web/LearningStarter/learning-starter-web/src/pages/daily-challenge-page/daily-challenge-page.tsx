@@ -17,7 +17,6 @@ import { useUser, useAuth } from "../../authentication/use-auth";
 import { showNotification } from "@mantine/notifications";
 import api from "../../config/axios";
 
-
 export const DailyChallengePage = () => {
   const userContext = useUser();
   const { refetchUser } = useAuth();
@@ -40,49 +39,69 @@ export const DailyChallengePage = () => {
     []
   );
 
+  const fetchWeeklyProgress = async () => {
+    try {
+      const response = await api.get<ApiResponse<any>>(`/api/daily-challenges/weekly-progress/${userContext.id}`);
+      setWeekProgress(response.data.data.weeklyProgress);
+    } catch (error) {
+      console.error("Failed to fetch weekly progress:", error);
+    }
+  };
+
+  const fetchUser = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get<ApiResponse<UserGetDto>>(`/api/users/${userContext.id}`);
+      setUser(response.data.data);
+    } catch (error) {
+      console.error("Failed to fetch user:", error);
+      showNotification({ message: "Failed to load user", color: "red" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchDailyChallenge = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get<ApiResponse<DailyChallengeGetDto>>(`/api/daily-challenges/today`);
+      setChallenge(response.data.data);
+      console.log("Challenge fetched:", response.data.data);
+    } catch (error) {
+      console.error("Failed to fetch challenge:", error);
+      showNotification({ message: "Failed to load challenge", color: "red" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     const saved = localStorage.getItem(`dailyChallenge-${userContext.id}-${new Date().toDateString()}`);
     if (saved) {
       const data = JSON.parse(saved);
       setAnswer(data.answer || "");
       setSubmissionResult(data.result || null);
-      setWeekProgress(data.weekProgress || weekProgress);
     }
-    fetchUser();
-    fetchDailyChallenge();
-  
-    async function fetchUser () {
-      try {
-        setLoading(true);
-        const response = await api.get<ApiResponse<UserGetDto>>(`/api/users/${userContext.id}`);
-        setUser(response.data.data);
-      } catch (error) {
-          console.error("Failed to fetch user:", error);
-          showNotification({ message: "Failed to load user", color: "red" });
-      } finally {
-          setLoading(false);
-      }
+    
+    const loadData = async () => {
+      await Promise.all([
+        fetchUser(),
+        fetchDailyChallenge(),
+        fetchWeeklyProgress()
+      ]);
     };
-
-    async function fetchDailyChallenge () {
-      try {
-        setLoading(true);
-        const response = await api.get<ApiResponse<DailyChallengeGetDto>>(`/api/daily-challenges/today`);
-        setChallenge(response.data.data);
-        console.log("Challenge fetched:", response.data.data);
-      } catch (error) {
-          console.error("Failed to fetch challenge:", error);
-          showNotification({ message: "Failed to load challenge", color: "red" });
-      } finally {
-          setLoading(false);
-      }
-    };
-
+    
+    loadData();
   }, [userContext.id]);
 
   const handleSubmit = async () => {
     if (!answer.trim()) {
-      showNotification({ message: "Please enter your answer", color: "orange" });
+      setSubmissionResult("Please enter your answer before submitting.");
+      return;
+    }
+
+    if (submissionResult && (submissionResult.startsWith("✔️") || submissionResult.startsWith("🫤"))) {
+      setSubmissionResult("You've already completed today's challenge! Come back tomorrow.");
       return;
     }
 
@@ -96,41 +115,48 @@ export const DailyChallengePage = () => {
       });
 
       const result = response.data.data;
-      const updatedWeek = [...weekProgress];
-      updatedWeek[todayIndex] = result.wasCorrect ? "correct" : "wrong";
       
-
+      const updatedWeekProgress = result.weeklyProgress || weekProgress;
+          
       setUser((prev) =>
         prev
           ? { ...prev, streakCount: result.newStreakCount }
           : prev
       );
+      
       await refetchUser();
+      
       const newResult = result.wasCorrect
-      ? `✅ Correct! Your streak count is now ${result.newStreakCount} 🔥`
-      : `❌ That’s not quite right. Try again tomorrow!\n\nCorrect answer: ${challenge?.correctSentence}`;
+        ? `✔️ Correct! Your streak count is now ${result.newStreakCount} 🔥`
+        : `🫤 That's not quite right. Try again tomorrow!\n\nCorrect answer: ${challenge?.correctSentence}`;
 
       setSubmissionResult(newResult);
-      setWeekProgress(updatedWeek);
+      setWeekProgress(updatedWeekProgress); 
+      
       localStorage.setItem(
         `dailyChallenge-${userContext.id}-${new Date().toDateString()}`,
         JSON.stringify({
           answer,
           result: newResult,
-          weekProgress: updatedWeek,
         })
       );
     
     } catch (error: any) {
       console.error("Submit error:", error);
-      showNotification({
-        message: error.response?.data?.errors?.[0] || "Failed to submit answer",
-        color: "red",
-      });
+      setSubmissionResult(`❌ ${error.response?.data?.errors?.[0] || "Failed to submit answer. Please try again."}`);
     } finally {
       setSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      fetchWeeklyProgress();
+    }
+  }, [user?.streakCount]);
+
+  const hasCompletedToday = Boolean(submissionResult && 
+    (submissionResult.startsWith("✔️") || submissionResult.startsWith("🫤")));
 
   if (loading || !user || !challenge) {
     return (
@@ -156,14 +182,14 @@ export const DailyChallengePage = () => {
       <Box className={classes.weekCard}>
         <Group justify="space-between" className={classes.weekRow}>
           {["S", "M", "T", "W", "Th", "F", "S"].map((d, i) => (
-            <Box key={d} className={classes.weekCell}>
+            <Box key={`${d}-${i}`} className={classes.weekCell}>
               <Text className={classes.weekLabel}>{d}</Text>
               {weekProgress[i] === "correct" ? (
-                <IconCircleCheck className={classes.dotSuccess} size={18} />
+                <IconCircleCheck className={classes.dotSuccess} size={22} />
               ) : weekProgress[i] === "wrong" ? (
-                <IconCircleX className={classes.dotError} size={18} />
+                <IconCircleX className={classes.dotError} size={22} />
               ) : (
-                <IconCircle className={classes.dotIdle} size={18} />
+                <IconCircle className={classes.dotIdle} size={22} />
               )}
             </Box>
           ))}
@@ -208,6 +234,7 @@ export const DailyChallengePage = () => {
           onChange={(e) => setAnswer(e.currentTarget.value)}
           className={cx(classes.cardArea, classes.answerArea)}
           styles={{ input: { background: "#F7F7F7", border: "none" } }}
+          disabled= {hasCompletedToday} // FIX: Disable input after completion
         />
 
         {submissionResult && (
@@ -215,17 +242,18 @@ export const DailyChallengePage = () => {
             mt="sm"
             p="sm"
             style={{
-              background: "#f9f9f9",
+              background: submissionResult.startsWith("✔️") ? "#f0f9f0" : "#fef0f0",
               borderRadius: 10,
               boxShadow: "inset 0 0 6px rgba(0,0,0,0.05)",
               textAlign: "left",
               width: "100%",
               whiteSpace: "pre-line", 
+              border: submissionResult.startsWith("✔️") ? "1px solid #27ae60" : "1px solid #e63946",
             }}
           >
             <Text
               fw={500}
-              color={submissionResult.startsWith("✅") ? "green" : "red"}
+              color={submissionResult.startsWith("✔️") ? "green" : "red"}
             >
               {submissionResult}
             </Text>
@@ -237,8 +265,11 @@ export const DailyChallengePage = () => {
             className={classes.pillBtn}
             loading={submitting}
             onClick={handleSubmit}
+            disabled={hasCompletedToday} // FIX: Disable button after completion
           >
-            Submit Answer
+            {hasCompletedToday 
+              ? "Challenge Completed!" 
+              : "Submit Answer"}
           </Button>
         </Center>
       </Box>

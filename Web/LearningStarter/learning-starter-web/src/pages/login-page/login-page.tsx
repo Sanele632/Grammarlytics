@@ -14,7 +14,6 @@ import {
   Divider,
 } from "@mantine/core";
 import api from "../../config/axios";
-import { showNotification } from "@mantine/notifications";
 import { createStyles } from "@mantine/emotion";
 import { Link, useNavigate } from "react-router-dom";
 import { PasswordInput } from "@mantine/core";
@@ -61,7 +60,6 @@ export const LoginPage = ({
     }
 
     if (response.data.data) {
-      showNotification({ message: "Successfully Logged In!", color: "green" });
       fetchCurrentUser();
     }
   }, []);

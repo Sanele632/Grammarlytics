@@ -14,8 +14,8 @@ public class User : IdentityUser<int>
     public string ProfilePicture { get; set; }
     public int StreakCount { get; set; } = 0;
     public DateOnly? LastChallengeDate { get; set; }
-
-
+    public string WeeklyProgress { get; set; } = "[\"idle\",\"idle\",\"idle\",\"idle\",\"idle\",\"idle\",\"idle\"]";
+    public DateOnly? WeekStartDate { get; set; }
 
     public List<UserRole> UserRoles { get; set; } = new();
 }
@@ -39,7 +39,6 @@ public class UserUpdateDto
     public string UserName { get; set; }
     public string Password { get; set; }
     public string Email { get; set; }
-    public int StreakCount { get; set; } = 0;
     public string ProfilePicture { get; set; }
     
 }
@@ -53,6 +52,8 @@ public class UserGetDto
     public string Email { get; set; }
     public int StreakCount { get; set; } = 0;
     public string ProfilePicture { get; set; }
+    public string WeeklyProgress { get; set; } 
+    public DateOnly? WeekStartDate { get; set; }
 }
 
 public class UserEntityConfiguration : IEntityTypeConfiguration<User>
