@@ -18,7 +18,8 @@ import { useUser } from "../../authentication/use-auth";
 /** ========================
  *  CONFIG
  *  ======================== */
-const NGROK_URL = "https://e47e098a8435.ngrok-free.app"; // update when Colab prints new URL
+// Use the same env var as LandingPage so you don't edit two places.
+const API_BASE = (import.meta.env.VITE_API_BASE as string) ?? "";
 const PURPLE = "#73268D";
 const HOME = "/";
 const PRACTICE = "/practice";
@@ -54,6 +55,7 @@ function normalize(s: string): string {
 function acceptableAlternatives(expected: string): string[] {
   const e = expected.trim();
   const alts = [e];
+  // allow semicolon alternative for compound sentences
   const m = e.match(/^(.*),\s+(and|but|or|nor|for|so|yet)\s+(.*)$/i);
   if (m) {
     const left = m[1].replace(/\s*\.\s*$/, "");
@@ -85,7 +87,7 @@ export const PracticePage = () => {
   const jsonHeaders = useMemo(() => ({ "Content-Type": "application/json" }), []);
 
   async function fetchPractice(topicKey: string): Promise<PracticeItem | null> {
-    const res = await fetch(`${NGROK_URL}/practice/generate`, {
+    const res = await fetch(`${API_BASE}/practice/generate`, {
       method: "POST",
       headers: jsonHeaders,
       body: JSON.stringify({ topic: topicKey, level: "medium", n: 1 }),
@@ -96,7 +98,7 @@ export const PracticePage = () => {
   }
 
   async function correctAnswerAPI(text: string): Promise<string> {
-    const res = await fetch(`${NGROK_URL}/correct`, {
+    const res = await fetch(`${API_BASE}/correct`, {
       method: "POST",
       headers: jsonHeaders,
       body: JSON.stringify({ text }),
@@ -160,6 +162,7 @@ export const PracticePage = () => {
           (keyItem?.explanation ? `\n\n${keyItem.explanation}` : "")
       );
     } catch (e: any) {
+      // Fallback: compare user answer directly if /correct failed
       const expSet = acceptableAlternatives(expected).map(normalize);
       const ok = expSet.includes(normalize(answer));
       setSolution(
@@ -203,7 +206,7 @@ export const PracticePage = () => {
         )}
 
         <Text className={classes.sectionLabel}>
-          What would you like to practice today, {user.firstName}?
+          What would you like to practice today, {user?.firstName ?? "there"}?
         </Text>
 
         <Group justify="center" mb={4} gap="sm">
@@ -277,13 +280,19 @@ export const PracticePage = () => {
           styles={{ input: { background: "#F7F7F7", border: "none" } }}
         />
       </Container>
-        </Box>
+    </Box>
   );
 };
 
 const useStyles = createStyles(() => ({
-  page: { minHeight: "100vh" },
+  page: {
+    // keep your soft purple gradient
+    background: "linear-gradient(180deg, #F4E8F9 0%, #F8ECFF 100%)",
+    minHeight: "100vh",
+  },
+
   main: { paddingTop: 12, paddingBottom: 40 },
+
   title: {
     textAlign: "center",
     color: PURPLE,
@@ -291,6 +300,7 @@ const useStyles = createStyles(() => ({
     fontSize: 40,
     margin: "12px 0",
   },
+
   segment: {
     width: 760,
     margin: "0 auto 18px auto",
@@ -307,6 +317,7 @@ const useStyles = createStyles(() => ({
       fontSize: 14,
     },
   },
+
   sectionLabel: {
     color: PURPLE,
     fontWeight: 500,
@@ -314,12 +325,14 @@ const useStyles = createStyles(() => ({
     marginTop: 4,
     marginBottom: 8,
   },
+
   card: {
     borderRadius: 24,
     boxShadow: "0px 4px 60px rgba(0,0,0,0.15)",
     padding: 10,
     textarea: { borderRadius: 24, padding: 16, fontSize: 14 },
   },
+
   pillBtn: {
     background: "#F7F7F7",
     color: PURPLE,
@@ -332,6 +345,7 @@ const useStyles = createStyles(() => ({
     "&:hover": { background: "#eee" },
     "&[data-disabled]": { opacity: 0.6, cursor: "not-allowed" },
   },
+
   selectPill: {
     maxWidth: 380,
     marginBottom: 8,
@@ -341,12 +355,8 @@ const useStyles = createStyles(() => ({
       height: 38,
       borderRadius: 999,
       paddingInline: 16,
-      color: PURPLE,
-      fontWeight: 500,
+      boxShadow: "0px 4px 25px rgba(0,0,0,0.15)",
     },
-    ".mantine-Select-dropdown": {
-      borderRadius: 12,
-      boxShadow: "0px 4px 20px rgba(0,0,0,0.1)",
-    },
+    ".mantine-Select-dropdown": { borderRadius: 12 },
   },
 }));
