@@ -60,3 +60,12 @@ export interface LearningResourceDto {
   content: string;
 }
 
+export type PracticeAttemptGetDto = {
+  id: number;
+  userId: number;
+  topic: string;
+  prompt: string;
+  answer: string;
+  feedback: string;
+  date: string;
+};

@@ -9,6 +9,7 @@ public sealed class DataContext : IdentityDbContext<User, Role, int>
 {
     public DbSet<DailyChallenge> DailyChallenges { get; set; }
     public DbSet<LearningResource> LearningResources { get; set; }
+    public DbSet<PracticeAttempt> PracticeAttempts { get; set; }
 
     public DataContext(DbContextOptions<DataContext> options)
         : base(options)

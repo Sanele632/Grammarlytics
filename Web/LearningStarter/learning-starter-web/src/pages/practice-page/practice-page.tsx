@@ -28,7 +28,7 @@ const PRACTICE = "/practice";
 type PracticeItem = {
   incorrect: string;
   corrected: string;
-  mistake_type: string;
+  mistakeType: string;
   explanation: string;
 };
 
@@ -87,7 +87,7 @@ export const PracticePage = () => {
   const jsonHeaders = useMemo(() => ({ "Content-Type": "application/json" }), []);
 
   async function fetchPractice(topicKey: string): Promise<PracticeItem | null> {
-    const res = await fetch(`${API_BASE}/practice/generate`, {
+    const res = await fetch('api/GrammarPractice/generate', {
       method: "POST",
       headers: jsonHeaders,
       body: JSON.stringify({ topic: topicKey, level: "medium", n: 1 }),
@@ -97,8 +97,22 @@ export const PracticePage = () => {
     return (data?.items?.[0] ?? null) as PracticeItem | null;
   }
 
+  async function saveAttempt(attempt: {
+    userId: number;
+    topic: string;
+    prompt: string;
+    answer: string;
+    feedback: string;
+  }) {
+    await fetch('api/GrammarPractice/save', {
+      method: "POST",
+      headers: jsonHeaders,
+      body: JSON.stringify(attempt),
+    });
+  }
+
   async function correctAnswerAPI(text: string): Promise<string> {
-    const res = await fetch(`${API_BASE}/correct`, {
+    const res = await fetch('api/GrammarPractice/correct', {
       method: "POST",
       headers: jsonHeaders,
       body: JSON.stringify({ text }),
@@ -142,6 +156,7 @@ export const PracticePage = () => {
       setSolution("Try writing an answer first 🙂");
       return;
     }
+
     const expected = keyItem?.corrected?.trim() ?? "";
     if (!expected) {
       setSolution("No expected solution loaded. Try generating a new sentence.");
@@ -149,33 +164,47 @@ export const PracticePage = () => {
     }
 
     setChecking(true);
+
     try {
+      // ✅ 1. Check with backend corrector
       const backendCorr = await correctAnswerAPI(answer);
+
       const expSet = acceptableAlternatives(expected).map(normalize);
       const ok =
         expSet.includes(normalize(backendCorr)) ||
         expSet.includes(normalize(answer));
 
-      setSolution(
+      const feedback =
         (ok ? "✅ Correct!\n\n" : "🟡 Not quite. One acceptable fix is:\n") +
-          expected +
-          (keyItem?.explanation ? `\n\n${keyItem.explanation}` : "")
-      );
+        expected +
+        (keyItem?.explanation ? `\n\n${keyItem.explanation}` : "");
+
+      setSolution(feedback);
+
+      await saveAttempt({
+        userId: user.id,
+        topic: topic!,
+        prompt: keyItem?.incorrect ?? "",
+        answer,
+        feedback,
+      });
+
     } catch (e: any) {
-      // Fallback: compare user answer directly if /correct failed
+      // Fallback only — still show the result but do NOT save
       const expSet = acceptableAlternatives(expected).map(normalize);
       const ok = expSet.includes(normalize(answer));
-      setSolution(
+
+      const feedback =
         (ok ? "✅ Correct!\n\n" : "🟡 Not quite. One acceptable fix is:\n") +
-          expected +
-          (keyItem?.explanation ? `\n\n${keyItem.explanation}` : "")
-      );
+        expected +
+        (keyItem?.explanation ? `\n\n${keyItem.explanation}` : "");
+
+      setSolution(feedback);
       setError(e?.message || "Failed to check your answer (used fallback).");
     } finally {
       setChecking(false);
     }
   };
-
   const regeneratePrompt = async () => {
     if (!topic) return;
     await handleTopicChange(topic);

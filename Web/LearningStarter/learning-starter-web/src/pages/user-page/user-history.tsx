@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   Container,
   Title,
@@ -14,81 +14,49 @@ import {
 import { showNotification } from "@mantine/notifications";
 import { createStyles } from "@mantine/emotion";
 import api from "../../config/axios";
-import { ApiResponse } from "../../constants/types";
+import { ApiResponse, PracticeAttemptGetDto, } from "../../constants/types";
+import { useUser } from "../../authentication/use-auth";
 
-interface PracticeAttempt {
-  prompt: string;
-  answer: string;
-  feedback: string;
-  date: string;
-}
 
 interface PracticeTopicGroup {
   topic: string;
-  attempts: PracticeAttempt[];
+  attempts: PracticeAttemptGetDto[];
 }
 
 export const UserHistory = () => {
+  const userContext = useUser();
   const { classes } = useStyles();
   const [loading, setLoading] = useState(true);
   const [history, setHistory] = useState<PracticeTopicGroup[]>([]);
-  const { id } = useParams();
 
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        // Simulate loading delay
-        await new Promise((r) => setTimeout(r, 800));
+        setLoading(true);
 
-        // Mock data (replace this later with real API)
-        const mockHistory: PracticeTopicGroup[] = [
-          {
-            topic: "Commas",
-            attempts: [
-              {
-                prompt:
-                  "After the game the players shook hands and left the field.",
-                answer:
-                  "After the game, the players shook hands and left the field.",
-                feedback: "Correct! A comma should follow introductory phrases.",
-                date: "2025-10-20T15:45:00",
-              },
-              {
-                prompt: "When the teacher entered the room everyone became quiet.",
-                answer:
-                  "When the teacher entered the room, everyone became quiet.",
-                feedback:
-                  "Correct! Commas help separate dependent clauses from main ones.",
-                date: "2025-10-18T09:22:00",
-              },
-            ],
-          },
-          {
-            topic: "Subject–Verb Agreement",
-            attempts: [
-              {
-                prompt: "Each of the players have a unique style.",
-                answer: "Each of the players has a unique style.",
-                feedback: "Correct — 'Each' is singular, so use 'has'.",
-                date: "2025-10-19T10:10:00",
-              },
-            ],
-          },
-          {
-            topic: "Verb Tense",
-            attempts: [
-              {
-                prompt: "He run every morning before work.",
-                answer: "He runs every morning before work.",
-                feedback: "Good! The verb should agree with the subject in tense.",
-                date: "2025-10-15T13:12:00",
-              },
-            ],
-          },
-        ];
+        const response = await api.get<PracticeAttemptGetDto[]>(
+          `/api/GrammarPractice/history/${userContext.id}`
+        );
 
-        setHistory(mockHistory);
+        const attempts = response.data || [];;
+
+        console.log("response.data:", response.data);
+        const grouped = attempts.reduce<PracticeTopicGroup[]>((acc, attempt) => {
+          const existing = acc.find((g) => g.topic === attempt.topic);
+          if (existing) {
+            existing.attempts.push(attempt);
+          } else {
+            acc.push({
+              topic: attempt.topic || "Unknown Topic",
+              attempts: [attempt],
+            });
+          }
+          return acc;
+        }, []);
+
+        setHistory(grouped);
       } catch (err) {
+        console.error("Error loading practice history:", err);
         showNotification({
           message: "Error loading practice history.",
           color: "red",
@@ -98,9 +66,10 @@ export const UserHistory = () => {
       }
     };
 
-    fetchHistory();
-  }, [id]);
-
+    if (userContext?.id) {
+      fetchHistory();
+    }
+  }, [userContext?.id]);
   
   if (loading) {
     return (
