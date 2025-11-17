@@ -72,18 +72,14 @@ export const PrimaryNavigation: React.FC<PrimaryNavigationProps> = () => {
       <Container fluid className={classes.navbar}>
         <Flex justify="space-between" align="center" className={classes.inner}>
           <Flex align="center" gap="md">
-            <ActionIcon
-              size="lg"
-              variant="subtle"
-              color="purple.8"
-              onClick={() => setSidebarOpened(true)}
-            >
-              <IconMenu2 size={24} />
-            </ActionIcon>
             <NavLink to={routes.root}>
               <Image src={logo} alt="logo" height={40} fit="contain" />
             </NavLink>
-          </Flex>
+            <NavLink to={routes.home} className={classes.navButton}>Home</NavLink>
+            <NavLink to={routes.dailyChallenge} className={classes.navButton}>Daily Challenge</NavLink>
+            <NavLink to={routes.learningResources} className={classes.navButton}>Learning Resources</NavLink>
+            <NavLink to={routes.user} className={classes.navButton}>Profile</NavLink>
+          </Flex>         
 
           {user && (
             <Flex align="center" gap="sm">
@@ -119,8 +115,6 @@ export const PrimaryNavigation: React.FC<PrimaryNavigationProps> = () => {
           )}
         </Flex>
       </Container>
-
-      <Sidebar opened={sidebarOpened} onClose={() => setSidebarOpened(false)} />
     </>
   );
 };
@@ -140,5 +134,31 @@ const useStyles = createStyles(() => ({
   },
   pointer: {
     cursor: "pointer",
+  },
+  desktopLinks: {
+    display: "none",
+    '@media (min-width: 768px)': {
+      display: "flex",
+    },
+  },
+
+  navButton: {
+    color: "black",
+    fontWeight: 400,
+    textDecoration: "none",
+    padding: "6px 10px",
+    borderRadius: 6,
+    borderLeft: "4px solid transparent", 
+    transition: "all 0.2s ease",
+
+    "&:hover": {
+      borderLeftColor: "purple", 
+      backgroundColor: "rgba(110, 38, 140, 0.05)", 
+    },
+
+    "&.active": {
+      borderLeftColor: "purple", 
+      backgroundColor: "rgba(110, 38, 140, 0.1)",
+    },
   },
 }));

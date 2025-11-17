@@ -80,16 +80,18 @@ export const UserHistory = () => {
     );
   }
 
-  const handleDelete = async (id: number) => {
-    try {
-      await api.delete(`/api/GrammarPractice/${id}`);
+  const handleDelete = async (attemptId: number) => {
+    const confirmed = window.confirm("Are you sure you want to delete this attempt?");
+    if (!confirmed) return;
 
-      // Remove from UI instantly
+    try {
+      await api.delete(`/api/GrammarPractice/${attemptId}`);
+
       setHistory((prev) =>
         prev
           .map((group) => ({
             ...group,
-            attempts: group.attempts.filter((a) => a.id !== id),
+            attempts: group.attempts.filter((x) => x.id !== attemptId),
           }))
           .filter((group) => group.attempts.length > 0)
       );
@@ -99,9 +101,9 @@ export const UserHistory = () => {
         color: "green",
       });
     } catch (err) {
-      console.error("Delete error:", err);
+      console.error(err);
       showNotification({
-        message: "Failed to delete practice attempt.",
+        message: "Failed to delete.",
         color: "red",
       });
     }
@@ -131,20 +133,6 @@ export const UserHistory = () => {
             <Accordion.Panel>
               {group.attempts.map((a, i) => (
                 <Card key={i} withBorder shadow="xs" mb="sm" radius="md">
-
-                  <Button
-                    variant="subtle"
-                    color="red"
-                    size="xs"
-                    pos="absolute"
-                    top={10}
-                    right={10}
-                    onClick={() => handleDelete(a.id)}
-                    p={4}
-                  >
-                    <IconTrash size={16} />
-                  </Button>
-                  
                   <Text fw={500}>Prompt:</Text>
                   <Text mb="xs">{a.prompt}</Text>
 
@@ -159,6 +147,19 @@ export const UserHistory = () => {
                   <Text size="xs" c="dimmed">
                     {new Date(a.date).toLocaleString()}
                   </Text>
+
+                  <Button
+                    variant="subtle"
+                    color="red"
+                    size="xs"
+                    pos="absolute"
+                    top={10}
+                    right={10}
+                    onClick={() => handleDelete(a.id)}
+                    p={4}
+                  >
+                    <IconTrash size={16} />
+                  </Button>
                 </Card>
               ))}
             </Accordion.Panel>
