@@ -1,6 +1,10 @@
 using System;
-using System;
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace LearningStarter.Entities;
 
@@ -37,3 +41,15 @@ public class PracticeAttemptGetDto
 
     public DateTime Date { get; set; } = DateTime.Now;
 }
+
+public class PracticeAttemptEntityConfiguration : IEntityTypeConfiguration<PracticeAttempt>
+{
+    public void Configure(EntityTypeBuilder<PracticeAttempt> builder)
+    {
+        builder.HasOne(pa => pa.User)
+            .WithMany()
+            .HasForeignKey(pa => pa.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+

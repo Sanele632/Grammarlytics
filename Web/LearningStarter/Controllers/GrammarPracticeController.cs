@@ -10,6 +10,9 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
+using LearningStarter.Common;
+using Microsoft.AspNetCore.Identity;
+
 
 namespace LearningStarter.Controllers;
 
@@ -31,9 +34,6 @@ namespace LearningStarter.Controllers;
             _colabBase = config["ColabBase"] ?? ""; 
         }
 
-        // -----------------------
-        // /correct
-        // -----------------------
         [HttpPost("correct")]
         public async Task<IActionResult> Correct([FromBody] JsonElement body)
         {
@@ -44,9 +44,6 @@ namespace LearningStarter.Controllers;
             return Content(result, "application/json");
         }
 
-        // -----------------------
-        // /generate
-        // -----------------------
         [HttpPost("generate")]
         public async Task<IActionResult> Generate([FromBody] JsonElement body)
         {
@@ -57,9 +54,6 @@ namespace LearningStarter.Controllers;
             return Content(result, "application/json");
         }
 
-        // -----------------------
-        // /save  → saves to your DB
-        // -----------------------
         public class SaveRequest
         {
             public int UserId { get; set; } 
@@ -87,10 +81,7 @@ namespace LearningStarter.Controllers;
 
             return Ok(new { success = true, id = item.Id });
         }
-
-        // -----------------------
-        // /history/{userId}
-        // -----------------------
+ 
         [HttpGet("history/{userId}")]
         public async Task<IActionResult> History(int userId)
         {
@@ -100,5 +91,25 @@ namespace LearningStarter.Controllers;
                 .ToListAsync();
 
             return Ok(data);
+        }
+
+        [HttpDelete("{id}")]
+        
+        public async Task<IActionResult> Delete(int id)
+        {
+            var response = new Response();
+
+            var practiceAttempt = _db.PracticeAttempts.FirstOrDefault(x => x.Id == id);
+
+            if (practiceAttempt == null)
+            {
+                response.AddError("id", "There was a problem deleting the practice attempt record.");
+                return NotFound(response);
+            }
+
+            _db.PracticeAttempts.Remove(practiceAttempt);
+            await _db.SaveChangesAsync();
+
+            return Ok(response);
         }
     }
