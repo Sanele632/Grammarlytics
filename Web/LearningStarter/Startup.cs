@@ -102,7 +102,10 @@ public class Startup
         services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddHttpClient();
+        services.AddSingleton<IAzureOpenAIService, AzureOpenAIService>();
         services.AddScoped<IAIChallengeService, AIChallengeService>();
+        services.AddScoped<IGrammarChatService, GrammarChatService>();
+
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

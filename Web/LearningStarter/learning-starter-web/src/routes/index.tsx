@@ -1,4 +1,3 @@
-// src/routes/paths.ts
 export const routes = {
   root: "/",
   home: "/",
@@ -9,6 +8,7 @@ export const routes = {
   userHistory: '/user/history',
   dailyChallenge: "/daily-challenge",
   learningResources: "/learning-resources",
-} as const;
+  grammarChat: '/grammar-chat',
+};
 
-export type RouteKey = keyof typeof routes;
+
