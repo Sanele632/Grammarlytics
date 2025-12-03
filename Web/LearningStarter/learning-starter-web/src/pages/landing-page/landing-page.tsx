@@ -103,7 +103,7 @@ export const LandingPage = () => {
 
       setOutputText(String(corrected));
     } catch (e: any) {
-      setErr(e?.message || "Failed to reach the grammar service.");
+      setErr(e?.message || "Grammar service is currently unavailable. Please try again later.");
       setOutputText("");
     } finally {
       setLoading(false);
