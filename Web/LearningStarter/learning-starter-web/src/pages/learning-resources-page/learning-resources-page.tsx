@@ -83,7 +83,7 @@ const ARTICLES: Record<
   },
 };
 
-export const LearningResourcesPage = () => {
+export const LearningResources = () => {
   const { classes, cx } = useStyles();
   const [selectedTopic, setSelectedTopic] = useState<string | null>("comma");
 

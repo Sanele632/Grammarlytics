@@ -14,27 +14,11 @@ public interface IAIChallengeService
 
 public class AIChallengeService : IAIChallengeService
 {
-    private readonly HttpClient _httpClient;
-    private readonly string _apiKey;
-    private readonly string _endpoint;
-    private readonly string _deployment;
-    private readonly string _apiVersion;
+    private readonly IAzureOpenAIService _ai;
 
-    public AIChallengeService(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+    public AIChallengeService(IAzureOpenAIService ai)
     {
-        _httpClient = httpClientFactory.CreateClient();
-
-        _apiKey = configuration["AzureOpenAI:Key"] 
-                  ?? throw new InvalidOperationException("Azure OpenAI API key not configured.");
-
-        _endpoint = configuration["AzureOpenAI:Endpoint"] 
-                    ?? throw new InvalidOperationException("Azure OpenAI endpoint not configured.");
-
-        _deployment = configuration["AzureOpenAI:DeploymentName"] 
-                      ?? throw new InvalidOperationException("Azure OpenAI deployment not configured.");
-
-        _apiVersion = configuration["AzureOpenAI:ApiVersion"] 
-                      ?? "2024-12-01-preview"; // default
+        _ai = ai;
     }
 
     public async Task<(string Incorrect, string Correct)> GenerateChallengeAsync()
@@ -61,44 +45,18 @@ public class AIChallengeService : IAIChallengeService
         }
         """;
 
-        // Prepare request
-        var url = $"{_endpoint}/openai/deployments/{_deployment}/chat/completions?api-version={_apiVersion}";
-
-        _httpClient.DefaultRequestHeaders.Clear();
-        _httpClient.DefaultRequestHeaders.Add("api-key", _apiKey);
-
-        var requestBody = new
+        var result = await _ai.GetChatCompletionAsync(new[]
         {
-            messages = new[]
-            {
-                new { role = "system", content = "You are a grammar challenge generator." },
-                new { role = "user", content = prompt }
-            },
-            max_tokens = 500,
-            temperature = 0.7
-        };
+            ("system", "You are a grammar challenge generator."),
+            ("user", prompt)
+        });
 
-        var response = await _httpClient.PostAsJsonAsync(url, requestBody);
-        response.EnsureSuccessStatusCode();
-
-        var json = await response.Content.ReadAsStringAsync();
-        using var doc = JsonDocument.Parse(json);
-
-        // Extract the content returned by the model
-        var content = doc.RootElement
-                         .GetProperty("choices")[0]
-                         .GetProperty("message")
-                         .GetProperty("content")
-                         .GetString();
-
-        if (string.IsNullOrWhiteSpace(content))
-            throw new InvalidOperationException("Azure OpenAI returned empty content.");
-
-        // Parse the JSON from model
-        using var parsed = JsonDocument.Parse(content);
+        using var parsed = JsonDocument.Parse(result);
         var incorrect = parsed.RootElement.GetProperty("incorrect").GetString()!;
         var correct = parsed.RootElement.GetProperty("correct").GetString()!;
 
         return (incorrect, correct);
     }
 }
+
+

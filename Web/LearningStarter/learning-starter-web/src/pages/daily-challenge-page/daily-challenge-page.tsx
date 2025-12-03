@@ -17,7 +17,7 @@ import { useUser, useAuth } from "../../authentication/use-auth";
 import { showNotification } from "@mantine/notifications";
 import api from "../../config/axios";
 
-export const DailyChallengePage = () => {
+export const DailyChallenge = () => {
   const userContext = useUser();
   const { refetchUser } = useAuth();
   const [user, setUser] = useState<UserGetDto | null>(null);
