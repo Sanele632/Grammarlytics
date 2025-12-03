@@ -140,9 +140,9 @@ export const PracticePage = () => {
       const item = await fetchPractice(v);
       setKeyItem(item);
       setPrompt(item?.incorrect ?? "");
-      if (!item) setError("Couldn't get a practice sentence. Try again.");
+      if (!item) setError("Couldn't get a practice sentence. Please try again.");
     } catch (e: any) {
-      setError(e?.message || "Failed to load practice sentence.");
+      setError(e?.message || "A loading error occurred. Please try again.");
       setPrompt("");
     } finally {
       setLoadingPrompt(false);
@@ -201,7 +201,7 @@ export const PracticePage = () => {
         (keyItem?.explanation ? `\n\n${keyItem.explanation}` : "");
 
       setSolution(feedback);
-      setError(e?.message || "Failed to check your answer (used fallback).");
+      setError(e?.message || "Something went wrong while checking your answer.Please try again");
     } finally {
       setChecking(false);
     }
