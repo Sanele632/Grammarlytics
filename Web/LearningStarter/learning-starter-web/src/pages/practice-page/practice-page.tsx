@@ -18,7 +18,6 @@ import { useUser } from "../../authentication/use-auth";
 /** ========================
  *  CONFIG
  *  ======================== */
-// Use the same env var as LandingPage so you don't edit two places.
 const API_BASE = (import.meta.env.VITE_API_BASE as string) ?? "";
 const PURPLE = "#73268D";
 const HOME = "/";
@@ -32,14 +31,16 @@ type PracticeItem = {
   explanation: string;
 };
 
-/** Topics sent to backend */
+/** IMPROVED TOPICS - Most commonly tested grammar mistakes */
 const TOPIC_OPTIONS = [
   { label: "Commas", value: "Commas" },
   { label: "Subject–Verb Agreement", value: "Subject–Verb Agreement" },
   { label: "Pronouns", value: "Pronouns" },
-  { label: "Modifiers", value: "Modifiers" },
-  { label: "Parallelism", value: "Parallelism" },
+  { label: "Apostrophes", value: "Apostrophes" },
+  { label: "Run-On Sentences", value: "Run-On Sentences" },
   { label: "Verb Tense", value: "Verb Tense" },
+  { label: "Sentence Fragments", value: "Sentence Fragments" },
+  { label: "Homophones", value: "Homophones" },
 ] as const;
 
 function normalize(s: string): string {
@@ -139,9 +140,9 @@ export const PracticePage = () => {
       const item = await fetchPractice(v);
       setKeyItem(item);
       setPrompt(item?.incorrect ?? "");
-      if (!item) setError("Couldn’t get a practice sentence. Try again.");
+      if (!item) setError("Couldn't get a practice sentence. Please try again.");
     } catch (e: any) {
-      setError(e?.message || "Failed to load practice sentence.");
+      setError(e?.message || "A loading error occurred. Please try again.");
       setPrompt("");
     } finally {
       setLoadingPrompt(false);
@@ -190,7 +191,7 @@ export const PracticePage = () => {
       });
 
     } catch (e: any) {
-      // Fallback only — still show the result but do NOT save
+      // Fallback only – still show the result but do NOT save
       const expSet = acceptableAlternatives(expected).map(normalize);
       const ok = expSet.includes(normalize(answer));
 
@@ -200,11 +201,12 @@ export const PracticePage = () => {
         (keyItem?.explanation ? `\n\n${keyItem.explanation}` : "");
 
       setSolution(feedback);
-      setError(e?.message || "Failed to check your answer (used fallback).");
+      setError(e?.message || "Something went wrong while checking your answer.Please try again");
     } finally {
       setChecking(false);
     }
   };
+
   const regeneratePrompt = async () => {
     if (!topic) return;
     await handleTopicChange(topic);
@@ -315,7 +317,6 @@ export const PracticePage = () => {
 
 const useStyles = createStyles(() => ({
   page: {
-    // keep your soft purple gradient
     background: "linear-gradient(180deg, #F4E8F9 0%, #F8ECFF 100%)",
     minHeight: "100vh",
   },

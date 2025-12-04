@@ -77,7 +77,6 @@ export const PrimaryNavigation: React.FC<PrimaryNavigationProps> = () => {
             </NavLink>
             <NavLink to={routes.home} className={classes.navButton}>Home</NavLink>
             <NavLink to={routes.dailyChallenge} className={classes.navButton}>Daily Challenge</NavLink>
-            <NavLink to={routes.learningResources} className={classes.navButton}>Learning Resources</NavLink>
             <NavLink to={routes.grammarChat} className={classes.navButton}>Grammar Chatbot</NavLink>
             <NavLink to={routes.user} className={classes.navButton}>Profile</NavLink>
           </Flex>         
