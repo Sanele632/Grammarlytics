@@ -24,6 +24,7 @@ export const DailyChallenge = () => {
   const [challenge, setChallenge] = useState<DailyChallengeGetDto | null>(null);
   const { classes, cx } = useStyles();
   const [answer, setAnswer] = useState("");
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [submissionResult, setSubmissionResult] = useState<string | null>(null);
@@ -66,10 +67,9 @@ export const DailyChallenge = () => {
       setLoading(true);
       const response = await api.get<ApiResponse<DailyChallengeGetDto>>(`/api/daily-challenges/today`);
       setChallenge(response.data.data);
-      console.log("Challenge fetched:", response.data.data);
     } catch (error) {
       console.error("Failed to fetch challenge:", error);
-      showNotification({ message: "Failed to load challenge", color: "red" });
+      setLoadError("Failed to load your Daily Challenge. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -158,7 +158,47 @@ export const DailyChallenge = () => {
   const hasCompletedToday = Boolean(submissionResult && 
     (submissionResult.startsWith("✔️") || submissionResult.startsWith("🫤")));
 
-  if (loading || !user || !challenge) {
+  if (loadError) {
+    return (
+      <Center style={{ height: "100vh", flexDirection: "column" }}>
+        <Text size="lg" fw={600} c="red" mb="xs" style={{ textAlign: "center" }}>
+          {loadError}
+        </Text>
+
+        <Button variant="light" color="red" onClick={() => window.location.reload()}>
+          Retry
+        </Button>
+      </Center>
+    );
+  }
+
+  if (loading) {
+    return (
+      <Center style={{ height: "100vh", flexDirection: "column" }}>
+        <Text size="lg" fw={600} mb="xs" style={{ color: "purple", textAlign: "center" }}>
+          AI is generating your Daily Challenge
+        </Text>
+        <Loader color="purple.6" size="md" variant="dots" />
+      </Center>
+    );
+  }
+
+  if (!user || !challenge) {
+    return (
+      <Center style={{ height: "100vh", flexDirection: "column" }}>
+        <Text size="lg" fw={600} c="red" mb="xs">
+          AI is unavailable right now. Please try again later.
+        </Text>
+        <Button variant="light" color="red" onClick={() => window.location.reload()}>
+          Retry
+        </Button>
+      </Center>
+    );
+  }
+
+  
+  {/* 
+  if (loading || !user || !challenge ) {
     return (
       <Center style={{ height: "100vh", flexDirection: "column" }}>
         <Text
@@ -173,6 +213,7 @@ export const DailyChallenge = () => {
       </Center>
     );
   }
+  */}
 
   return (
     <Container className={classes.page}>

@@ -100,10 +100,11 @@ export const LandingPage = () => {
         setOutputText("");
         return;
       }
+      
 
       setOutputText(String(corrected));
     } catch (e: any) {
-      setErr(e?.message || "Grammar service is currently unavailable. Please try again later.");
+      setErr("Grammar service is currently unavailable. Please try again later.");
       setOutputText("");
     } finally {
       setLoading(false);
@@ -199,7 +200,7 @@ export const LandingPage = () => {
           className={`${classes.card} ${loading ? classes.loading : ""}`}
           minRows={8}
           autosize
-          value={loading ? "Analyzing…" : outputText}
+          value={loading ? "AI is analyzing your text…" : outputText}
           onChange={(e) => setOutputText(e.currentTarget.value)}
           placeholder="The corrected version will appear here."
           styles={{ input: { background: "#F7F7F7", border: "none" } }}

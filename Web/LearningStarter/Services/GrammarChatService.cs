@@ -19,7 +19,7 @@ public class GrammarChatService : IGrammarChatService
     {
         var messages = new[]
         {
-            ("system", "You are a grammar tutor. Format your responses using Markdown. Use bullet points, headings, and short paragraphs."),
+            ("system", "You are a grammar tutor. You only answer grammar questions. Format your responses using Markdown. Use bullet points, headings, and short paragraphs."),
             ("user", question)
         };
 
