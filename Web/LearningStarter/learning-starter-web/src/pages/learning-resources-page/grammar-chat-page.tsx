@@ -58,6 +58,15 @@ export default function GrammarChat() {
   };
 
   useEffect(() => {
+    setMessages([
+      {
+        role: "assistant",
+        content: "Hello! I'm your grammar tutor. How can I help you today?"
+      }
+    ]);
+  }, []);
+
+  useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
     }
